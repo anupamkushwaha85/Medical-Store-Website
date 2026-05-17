@@ -1,6 +1,6 @@
-# Yashi Medical Store
+# Jaya Medical Store
 
-A professional medical and pharma e-commerce frontend for **Yashi Medical Store**, owned by **Madan Mohan Mishra**. The site is built as a responsive React SPA with product browsing, prescription uploads, cart management, contact forms, and GitHub Pages deployment.
+A professional medical and pharma e-commerce frontend for **Jaya Medical Store**, owned by **Madan Mohan Mishra**. The site is built as a responsive React SPA with product browsing, prescription uploads, cart management, contact forms, and GitHub Pages deployment.
 
 ## Live URL
 
@@ -92,7 +92,7 @@ git config user.email "149708150+anupamkushwaha85@users.noreply.github.com"
 git config user.name "anupamkushwaha85"
 git remote add origin https://github.com/anupamkushwaha85/MMM-Medical-Store.git
 git add .
-git commit -m "feat: initial commit - Yashi Medical Store"
+git commit -m "feat: initial commit - Jaya Medical Store"
 git branch -M main
 git push -u origin main
 ```
