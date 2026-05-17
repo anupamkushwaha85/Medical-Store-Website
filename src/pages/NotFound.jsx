@@ -17,7 +17,7 @@ export default function NotFound() {
                         </p>
                         <Link
                             to="/"
-                            className="inline-flex items-center gap-2 rounded-full bg-brand-500 px-6 py-3 text-sm font-semibold text-white"
+                            className="glass-button text-brand-800"
                         >
                             Go home
                             <Icon name="ArrowRight" className="h-4 w-4" />

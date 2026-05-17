@@ -11,12 +11,12 @@ export default function Cart() {
 
     const deliveryCharge = subtotal > 999 || subtotal === 0 ? 0 : 49;
     const taxes = Math.round(subtotal * 0.05);
-    const [promoCode, setPromoCode] = useState('YASHI10');
-    const discount = promoCode === 'YASHI10' ? Math.round(subtotal * 0.1) : 0;
+    const [promoCode, setPromoCode] = useState('JAYA10');
+    const discount = promoCode === 'JAYA10' ? Math.round(subtotal * 0.1) : 0;
     const total = Math.max(0, subtotal + deliveryCharge + taxes - discount);
 
     const applyPromo = () => {
-        if (promoCode.trim().toUpperCase() === 'YASHI10') {
+        if (promoCode.trim().toUpperCase() === 'JAYA10') {
             toast.success('Promo code applied.');
         } else {
             toast.error('Promo code not recognized.');
@@ -34,7 +34,7 @@ export default function Cart() {
                         <p className="mt-3 text-sm leading-7 text-slate-600">Browse products and add medicines or wellness essentials to start your order.</p>
                         <Link
                             to="/products"
-                            className="mt-8 inline-flex items-center gap-2 rounded-full bg-brand-500 px-6 py-3 text-sm font-semibold text-white"
+                            className="glass-button mt-8 text-brand-800"
                         >
                             Browse products
                         </Link>
@@ -73,7 +73,7 @@ export default function Cart() {
                                                 removeFromCart(item.id);
                                                 toast.success(`${item.name} removed from cart.`);
                                             }}
-                                            className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-600"
+                                            className="glass-button px-3 py-2 text-sm text-slate-700"
                                         >
                                             <Icon name="Trash2" className="h-4 w-4" />
                                             Remove
@@ -88,7 +88,7 @@ export default function Cart() {
                                             <button
                                                 type="button"
                                                 onClick={() => setItemQuantity(item.id, Math.max(1, item.quantity - 1))}
-                                                className="inline-flex h-11 w-11 items-center justify-center"
+                                                className="glass-button h-11 w-11 px-0 py-0"
                                                 aria-label="Decrease quantity"
                                             >
                                                 <Icon name="Minus" className="h-4 w-4" />
@@ -97,7 +97,7 @@ export default function Cart() {
                                             <button
                                                 type="button"
                                                 onClick={() => setItemQuantity(item.id, item.quantity + 1)}
-                                                className="inline-flex h-11 w-11 items-center justify-center"
+                                                className="glass-button h-11 w-11 px-0 py-0"
                                                 aria-label="Increase quantity"
                                             >
                                                 <Icon name="Plus" className="h-4 w-4" />
@@ -142,7 +142,7 @@ export default function Cart() {
                                     <button
                                         type="button"
                                         onClick={applyPromo}
-                                        className="rounded-2xl bg-slate-950 px-5 py-3 text-sm font-semibold text-white"
+                                        className="glass-button px-5 py-3 text-sm text-slate-800"
                                     >
                                         Apply
                                     </button>
@@ -151,7 +151,7 @@ export default function Cart() {
 
                             <Link
                                 to="/contact"
-                                className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-full bg-brand-500 px-6 py-3.5 text-sm font-semibold text-white"
+                                className="glass-button mt-5 w-full px-6 py-3.5 text-sm text-brand-800"
                             >
                                 Proceed to checkout
                                 <Icon name="ArrowRight" className="h-4 w-4" />

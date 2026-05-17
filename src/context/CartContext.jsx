@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { products } from '../data/products';
 
 const CartContext = createContext(null);
-const STORAGE_KEY = 'yashi-medical-cart';
+const STORAGE_KEY = 'jaya-medical-cart';
 
 const readStoredCart = () => {
     if (typeof window === 'undefined') {
