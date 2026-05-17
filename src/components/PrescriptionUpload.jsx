@@ -42,6 +42,8 @@ export default function PrescriptionUpload() {
         }
     };
 
+    const removeFile = () => setFile(null);
+
     const handleSubmit = async (event) => {
         event.preventDefault();
         if (!file) {
@@ -75,17 +77,27 @@ export default function PrescriptionUpload() {
         }
     };
 
-    return (
-        <div className="grid gap-8 rounded-[36px] border border-brand-100 bg-white p-6 shadow-soft lg:grid-cols-[1.15fr_0.85fr] lg:p-8">
-            <form onSubmit={handleSubmit} className="space-y-5">
-                <div>
-                    <p className="text-sm font-semibold uppercase tracking-[0.3em] text-brand-700">Prescription upload</p>
-                    <h2 className="mt-2 font-display text-3xl text-slate-900">Share your prescription securely</h2>
-                    <p className="mt-3 max-w-xl text-sm leading-6 text-slate-600">
-                        Upload a JPG, PNG, or PDF and add the details the pharmacy needs to prepare your order carefully.
-                    </p>
-                </div>
+    const inputBaseClass =
+        'w-full rounded-[14px] border border-outline-variant/40 bg-surface-container-lowest px-4 py-3.5 text-[15px] text-on-background outline-none transition-all duration-200 placeholder:text-outline/50 focus:border-primary focus:ring-2 focus:ring-primary/10';
 
+    return (
+        <div className="rounded-[32px] border border-outline-variant/30 bg-surface-container-lowest p-7 shadow-[0_20px_60px_rgba(0,104,95,0.06)] sm:p-9">
+            {/* Header */}
+            <div className="mb-8">
+                <span className="inline-flex items-center gap-1.5 text-[12px] font-bold uppercase tracking-[0.15em] text-primary">
+                    <Icon name="ClipboardList" className="h-3.5 w-3.5" />
+                    Prescription Form
+                </span>
+                <h2 className="mt-3 font-display text-[28px] font-semibold leading-[1.2] text-on-background sm:text-[32px]">
+                    Share your prescription securely
+                </h2>
+                <p className="mt-3 max-w-lg text-[14px] leading-[1.7] text-on-surface-variant">
+                    Upload a JPG, PNG, or PDF and provide details so the pharmacy can prepare your order with care.
+                </p>
+            </div>
+
+            <form onSubmit={handleSubmit} className="space-y-6">
+                {/* File drop zone */}
                 <div
                     onDragOver={(event) => {
                         event.preventDefault();
@@ -93,98 +105,144 @@ export default function PrescriptionUpload() {
                     }}
                     onDragLeave={() => setDragActive(false)}
                     onDrop={handleDrop}
-                    className={`rounded-[30px] border-2 border-dashed p-6 transition ${dragActive ? 'border-brand-500 bg-brand-50' : 'border-brand-100 bg-slate-50'}`}
+                    className={`group relative rounded-[22px] border-2 border-dashed p-8 transition-all duration-300 ${
+                        dragActive
+                            ? 'border-primary bg-primary/[0.06] shadow-[0_0_0_4px_rgba(0,104,95,0.08)]'
+                            : file
+                              ? 'border-primary/30 bg-primary/[0.03]'
+                              : 'border-outline-variant/50 bg-surface-container-low hover:border-primary/30 hover:bg-primary/[0.02]'
+                    }`}
                 >
-                    <label className="flex cursor-pointer flex-col items-center justify-center gap-3 text-center">
-                        <span className="flex h-14 w-14 items-center justify-center rounded-full bg-white text-brand-700 shadow-soft">
-                            <Icon name="Upload" className="h-6 w-6" />
-                        </span>
-                        <span className="font-semibold text-slate-900">Drop prescription here or click to upload</span>
-                        <span className="text-sm text-slate-500">Accepted formats: JPG, PNG, PDF</span>
-                        <input type="file" accept=".jpg,.jpeg,.png,.pdf" className="hidden" onChange={setPrescriptionFile} />
-                    </label>
-                    {file ? <p className="mt-4 text-sm font-medium text-brand-700">Selected file: {file.name}</p> : null}
+                    {!file ? (
+                        <label className="flex cursor-pointer flex-col items-center justify-center gap-4 text-center">
+                            <span className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 text-primary transition-transform duration-300 group-hover:scale-105">
+                                <Icon name="Upload" className="h-7 w-7" />
+                            </span>
+                            <div>
+                                <span className="text-[16px] font-semibold text-on-background">
+                                    Drop your prescription here
+                                </span>
+                                <span className="mt-1 block text-[13px] text-on-surface-variant">
+                                    or <span className="font-medium text-primary underline underline-offset-2">browse files</span> to upload
+                                </span>
+                            </div>
+                            <div className="flex gap-2">
+                                {['JPG', 'PNG', 'PDF'].map((fmt) => (
+                                    <span
+                                        key={fmt}
+                                        className="rounded-full border border-outline-variant/30 bg-surface-container-lowest px-2.5 py-0.5 text-[11px] font-semibold text-on-surface-variant"
+                                    >
+                                        {fmt}
+                                    </span>
+                                ))}
+                            </div>
+                            <input
+                                type="file"
+                                accept=".jpg,.jpeg,.png,.pdf"
+                                className="hidden"
+                                onChange={setPrescriptionFile}
+                            />
+                        </label>
+                    ) : (
+                        <div className="flex items-center justify-between gap-4">
+                            <div className="flex items-center gap-3">
+                                <div className="flex h-11 w-11 items-center justify-center rounded-[12px] bg-primary/10 text-primary">
+                                    <Icon name="FileText" className="h-5 w-5" />
+                                </div>
+                                <div>
+                                    <p className="text-[14px] font-semibold text-on-background">{file.name}</p>
+                                    <p className="text-[12px] text-on-surface-variant">
+                                        {(file.size / 1024).toFixed(1)} KB · Ready to upload
+                                    </p>
+                                </div>
+                            </div>
+                            <button
+                                type="button"
+                                onClick={removeFile}
+                                className="flex h-9 w-9 items-center justify-center rounded-full border border-outline-variant/40 text-on-surface-variant transition-colors duration-200 hover:border-error/40 hover:bg-error/8 hover:text-error"
+                            >
+                                <Icon name="X" className="h-4 w-4" />
+                            </button>
+                        </div>
+                    )}
                 </div>
 
-                <div className="grid gap-4 sm:grid-cols-2">
-                    <label className="space-y-2 text-sm font-medium text-slate-700">
-                        Patient name
+                {/* Name & Phone */}
+                <div className="grid gap-5 sm:grid-cols-2">
+                    <label className="space-y-2">
+                        <span className="text-[13px] font-semibold text-on-surface-variant">Patient Name</span>
                         <input
                             name="patient_name"
                             value={form.patient_name}
                             onChange={onChange}
                             required
-                            className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-slate-900 outline-none transition focus:border-brand-500"
+                            placeholder="Full name"
+                            className={inputBaseClass}
                         />
                     </label>
-                    <label className="space-y-2 text-sm font-medium text-slate-700">
-                        Phone
+                    <label className="space-y-2">
+                        <span className="text-[13px] font-semibold text-on-surface-variant">Phone Number</span>
                         <input
                             name="phone"
                             value={form.phone}
                             onChange={onChange}
                             required
                             type="tel"
-                            className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-slate-900 outline-none transition focus:border-brand-500"
+                            placeholder="+91 XXXXX XXXXX"
+                            className={inputBaseClass}
                         />
                     </label>
                 </div>
 
-                <label className="space-y-2 text-sm font-medium text-slate-700">
-                    Address
+                {/* Address */}
+                <label className="block space-y-2">
+                    <span className="text-[13px] font-semibold text-on-surface-variant">Delivery Address</span>
                     <textarea
                         name="address"
                         value={form.address}
                         onChange={onChange}
                         rows="3"
                         required
-                        className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-slate-900 outline-none transition focus:border-brand-500"
+                        placeholder="House no., street, locality, city, pincode"
+                        className={inputBaseClass + ' resize-none'}
                     />
                 </label>
 
-                <label className="space-y-2 text-sm font-medium text-slate-700">
-                    Notes
+                {/* Notes */}
+                <label className="block space-y-2">
+                    <span className="flex items-center gap-1.5 text-[13px] font-semibold text-on-surface-variant">
+                        Notes
+                        <span className="text-[11px] font-normal text-outline">(optional)</span>
+                    </span>
                     <textarea
                         name="notes"
                         value={form.notes}
                         onChange={onChange}
-                        rows="4"
+                        rows="3"
                         placeholder="Mention dosage timing, brand preference, or any delivery note."
-                        className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-slate-900 outline-none transition focus:border-brand-500"
+                        className={inputBaseClass + ' resize-none'}
                     />
                 </label>
 
+                {/* Submit button */}
                 <button
                     type="submit"
                     disabled={sending}
-                    className="inline-flex items-center gap-2 rounded-full bg-brand-500 px-6 py-3 text-sm font-semibold text-white transition hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-70"
+                    className="inline-flex w-full items-center justify-center gap-2.5 rounded-full bg-primary px-8 py-4 text-[15px] font-semibold tracking-[0.03em] text-on-primary shadow-[0_10px_30px_rgba(0,104,95,0.18)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-primary-container hover:text-on-primary-container hover:shadow-[0_16px_40px_rgba(0,104,95,0.22)] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0 sm:w-auto"
                 >
-                    {sending ? 'Sending...' : 'Submit prescription'}
-                    <Icon name="ArrowRight" className="h-4 w-4" />
+                    {sending ? (
+                        <>
+                            <Icon name="RefreshCw" className="h-4 w-4 animate-spin" />
+                            Submitting...
+                        </>
+                    ) : (
+                        <>
+                            Submit Prescription
+                            <Icon name="ArrowRight" className="h-4 w-4" />
+                        </>
+                    )}
                 </button>
             </form>
-
-            <aside className="space-y-5 rounded-[30px] bg-slate-950 p-6 text-white">
-                <div>
-                    <p className="text-sm font-semibold uppercase tracking-[0.3em] text-brand-200">Doctor consultation note</p>
-                    <p className="mt-3 text-2xl font-display">We check prescriptions before dispatch.</p>
-                </div>
-                <p className="text-sm leading-6 text-slate-300">
-                    If a medicine requires prescription verification, the team reviews the uploaded file and contacts you only if anything needs clarification.
-                </p>
-                <div className="rounded-[26px] border border-white/10 bg-white/5 p-5">
-                    <p className="text-sm font-medium text-brand-100">Accepted files</p>
-                    <p className="mt-2 text-sm leading-6 text-slate-300">
-                        JPG, PNG, and PDF are supported. Keep the file readable and include a clear patient name.
-                    </p>
-                </div>
-                <div className="rounded-[26px] border border-white/10 bg-brand-500/15 p-5">
-                    <p className="text-sm font-medium text-brand-100">Fast support</p>
-                    <p className="mt-2 text-sm leading-6 text-slate-300">
-                        Use the contact page or WhatsApp if you need help before uploading.
-                    </p>
-                </div>
-            </aside>
         </div>
     );
 }
