@@ -4,7 +4,7 @@ A professional medical and pharma e-commerce frontend for **Jaya Medical Store**
 
 ## Live URL
 
-https://anupamkushwaha85.github.io/MMM-Medical-Store/
+https://anupamkushwaha85.github.io/Medical-Store-Website/
 
 ## Tech Stack
 
@@ -90,7 +90,7 @@ Add screenshots here after the first production build or deploy preview.
 git init
 git config user.email "149708150+anupamkushwaha85@users.noreply.github.com"
 git config user.name "anupamkushwaha85"
-git remote add origin https://github.com/anupamkushwaha85/MMM-Medical-Store.git
+git remote add origin https://github.com/anupamkushwaha85/Medical-Store-Website.git
 git add .
 git commit -m "feat: initial commit - Jaya Medical Store"
 git branch -M main
