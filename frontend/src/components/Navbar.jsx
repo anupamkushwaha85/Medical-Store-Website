@@ -3,6 +3,8 @@ import { Link, NavLink, useLocation } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { footerLinks } from '../data/products';
 import Icon from './Icons';
+import ThemeToggle from './ThemeToggle';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const navLinks = footerLinks.filter((link) => link.label !== 'Home');
 
@@ -16,18 +18,14 @@ export default function Navbar() {
     }, [location.pathname]);
 
     return (
-        <header className="sticky top-0 z-50 border-b border-brand-100/80 bg-white/90 backdrop-blur-xl">
+        <header className="sticky top-0 z-50 border-b border-border bg-[var(--glass-bg)] backdrop-blur-xl shadow-[0_2px_10px_rgba(0,0,0,0.05)] dark:shadow-[0_2px_10px_rgba(0,0,0,0.4)] transition-colors duration-300">
             <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
-                <Link to="/" className="flex items-center gap-3">
-                    <p className="font-display text-xl text-primary">Jaya Medical Store</p>
-                </Link>
-
-                <div className="hidden sm:flex items-center gap-3 ml-2">
-                    <div className="glass-pill">
-                        <Icon name="MapPin" className="h-4 w-4 text-primary" />
-                        <span className="font-medium">485001</span>
+                <Link to="/" className="flex items-center gap-3 group">
+                    <div className="bg-primary/10 p-2 rounded-xl group-hover:bg-primary/20 transition-colors">
+                        <Icon name="Activity" className="h-6 w-6 text-primary" />
                     </div>
-                </div>
+                    <p className="font-serif text-xl font-bold tracking-tight text-[#00685f] dark:text-[#38b2ac]">Jaya Medical Store</p>
+                </Link>
 
                 <nav className="hidden items-center gap-8 lg:flex" aria-label="Primary navigation">
                     <NavLink to="/" className={({ isActive }) => navLinkClass(isActive)}>
@@ -40,62 +38,86 @@ export default function Navbar() {
                     ))}
                 </nav>
 
-                <div className="hidden items-center gap-3 lg:flex">
+                <div className="hidden items-center gap-4 lg:flex">
+                    <ThemeToggle />
                     <Link
                         to="/cart"
-                        className="glass-button px-4 py-2 text-sm text-brand-800"
+                        className="glass-button bg-surface text-text hover:bg-bg-subtle relative"
                     >
-                        <Icon name="ShoppingCart" className="h-4 w-4" />
-                        Cart
-                        {cartCount > 0 ? <span className="rounded-full bg-brand-500 px-2 py-0.5 text-xs text-white">{cartCount}</span> : null}
+                        <Icon name="ShoppingCart" className="h-5 w-5" />
+                        <span>Cart</span>
+                        <AnimatePresence>
+                            {cartCount > 0 && (
+                                <motion.span
+                                    initial={{ scale: 0 }}
+                                    animate={{ scale: 1 }}
+                                    exit={{ scale: 0 }}
+                                    className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-secondary text-[10px] font-bold text-white shadow-sm"
+                                >
+                                    {cartCount}
+                                </motion.span>
+                            )}
+                        </AnimatePresence>
                     </Link>
                 </div>
 
-                <button
-                    type="button"
-                    className="glass-icon-button h-11 w-11 lg:hidden"
-                    aria-label={menuOpen ? 'Close menu' : 'Open menu'}
-                    aria-expanded={menuOpen}
-                    onClick={() => setMenuOpen((value) => !value)}
-                >
-                    <Icon name={menuOpen ? 'X' : 'Menu'} className="h-5 w-5" />
-                </button>
+                <div className="flex items-center gap-2 lg:hidden">
+                    <ThemeToggle />
+                    <button
+                        type="button"
+                        className="p-2 rounded-xl bg-surface text-text hover:bg-bg-subtle transition-colors"
+                        aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+                        aria-expanded={menuOpen}
+                        onClick={() => setMenuOpen((value) => !value)}
+                    >
+                        <Icon name={menuOpen ? 'X' : 'Menu'} className="h-5 w-5" />
+                    </button>
+                </div>
             </div>
 
-            {menuOpen ? (
-                <div className="border-t border-brand-100 bg-white/80 backdrop-blur-xl lg:hidden">
-                    <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6">
-                        <div className="flex flex-col gap-3">
-                            <NavLink to="/" className={({ isActive }) => mobileNavClass(isActive)}>
-                                Home
-                            </NavLink>
-                            {navLinks.map((link) => (
-                                <NavLink key={link.to} to={link.to} className={({ isActive }) => mobileNavClass(isActive)}>
-                                    {link.label}
+            <AnimatePresence>
+                {menuOpen && (
+                    <motion.div 
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="border-t border-border bg-[var(--glass-bg)] backdrop-blur-xl lg:hidden overflow-hidden"
+                    >
+                        <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6">
+                            <div className="flex flex-col gap-2">
+                                <NavLink to="/" className={({ isActive }) => mobileNavClass(isActive)}>
+                                    Home
                                 </NavLink>
-                            ))}
-                            <NavLink to="/cart" className={({ isActive }) => mobileNavClass(isActive)}>
-                                Cart {cartCount > 0 ? <span className="ml-2 rounded-full bg-brand-100 px-2 py-0.5 text-xs text-brand-800">{cartCount}</span> : null}
-                            </NavLink>
-                            <Link to="/products" className="glass-button w-full rounded-2xl px-4 py-3 text-center text-brand-800">
-                                Browse Products
-                            </Link>
+                                {navLinks.map((link) => (
+                                    <NavLink key={link.to} to={link.to} className={({ isActive }) => mobileNavClass(isActive)}>
+                                        {link.label}
+                                    </NavLink>
+                                ))}
+                                <NavLink to="/cart" className={({ isActive }) => mobileNavClass(isActive)}>
+                                    <span className="flex items-center justify-between w-full">
+                                        Cart
+                                        {cartCount > 0 && (
+                                            <span className="rounded-full bg-secondary px-2 py-0.5 text-xs text-white">{cartCount}</span>
+                                        )}
+                                    </span>
+                                </NavLink>
+                            </div>
                         </div>
-                    </div>
-                </div>
-            ) : null}
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </header>
     );
 }
 
 const navLinkClass = (isActive) =>
     [
-        'text-sm font-medium transition',
-        isActive ? 'text-brand-700' : 'text-slate-600 hover:text-slate-900',
+        'text-sm font-medium transition-colors relative',
+        isActive ? 'text-primary after:absolute after:bottom-[-4px] after:left-0 after:h-0.5 after:w-full after:bg-primary after:rounded-full' : 'text-text-muted hover:text-text',
     ].join(' ');
 
 const mobileNavClass = (isActive) =>
     [
-        'glass-button w-full rounded-2xl px-4 py-3 text-sm font-medium',
-        isActive ? 'text-brand-800' : 'text-slate-700',
+        'flex items-center p-3 rounded-xl text-sm font-medium transition-colors',
+        isActive ? 'bg-primary/10 text-primary' : 'text-text hover:bg-bg-subtle',
     ].join(' ');
