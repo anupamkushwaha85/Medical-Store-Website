@@ -6,61 +6,66 @@ export default function TermsConditions() {
         <>
             <Seo title="Terms and Conditions" description="Terms and Conditions for Jaya Medical Store." />
 
-            <main className="mx-auto max-w-[1000px] px-5 pt-16 pb-24 sm:px-6 md:px-16">
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, ease: 'easeOut' }}
-                >
-                    <h1 className="font-display text-[44px] font-bold leading-[1.15] text-on-background sm:text-[56px] tracking-tight">
-                        Terms & Conditions
-                    </h1>
-                    <p className="mt-4 text-[16px] text-on-surface-variant">
-                        Last updated: {new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
-                    </p>
-                </motion.div>
+            <main className="bg-surface min-h-[calc(100vh-72px)] relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-1/3 h-[400px] bg-primary/5 blur-[120px] pointer-events-none" />
 
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: 0.15, ease: 'easeOut' }}
-                    className="mt-12 space-y-10 rounded-[24px] border border-white/40 bg-white/35 p-8 shadow-[0_14px_40px_rgba(15,23,42,0.06)] backdrop-blur-2xl md:p-12"
-                >
-                    <section className="space-y-4">
-                        <h2 className="font-display text-[28px] font-semibold text-on-background">1. Acceptance of Terms</h2>
-                        <p className="text-[16px] leading-[1.7] text-on-surface-variant">
-                            By accessing and using the Jaya Medical Store website, you agree to be bound by these Terms and Conditions. If you do not agree with any part of these terms, please do not use our services.
+                <div className="mx-auto max-w-[1000px] px-5 py-16 sm:px-6 md:px-16 relative z-10">
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6, ease: 'easeOut' }}
+                    >
+                        <span className="kicker">Legal</span>
+                        <h1 className="display-heading !mb-4 tracking-tight">
+                            Terms & Conditions
+                        </h1>
+                        <p className="text-base text-text-muted">
+                            Last updated: {new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
                         </p>
-                    </section>
+                    </motion.div>
 
-                    <section className="space-y-4">
-                        <h2 className="font-display text-[28px] font-semibold text-on-background">2. Prescription Requirements</h2>
-                        <p className="text-[16px] leading-[1.7] text-on-surface-variant">
-                            Certain medications listed on our platform require a valid prescription from a registered medical practitioner. We reserve the right to cancel any order if a valid, legible prescription is not provided or if our pharmacists determine the prescription to be invalid.
-                        </p>
-                    </section>
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6, delay: 0.15, ease: 'easeOut' }}
+                        className="mt-12 space-y-10 glass-card p-8 md:p-12"
+                    >
+                        <section className="space-y-4">
+                            <h2 className="font-serif text-2xl font-semibold text-text">1. General</h2>
+                            <p className="text-base leading-relaxed text-text-muted">
+                                By accessing and placing an order with Jaya Medical Store, you confirm that you are in agreement with and bound by the terms of service contained in the Terms & Conditions outlined below. These terms apply to the entire website and any email or other type of communication between you and Jaya Medical Store.
+                            </p>
+                        </section>
 
-                    <section className="space-y-4">
-                        <h2 className="font-display text-[28px] font-semibold text-on-background">3. Product Information and Pricing</h2>
-                        <p className="text-[16px] leading-[1.7] text-on-surface-variant">
-                            While we strive to provide accurate product information and pricing, errors may occur. In the event that a product is listed at an incorrect price, we reserve the right to refuse or cancel any orders placed for that product. Prices and availability are subject to change without notice.
-                        </p>
-                    </section>
+                        <section className="space-y-4">
+                            <h2 className="font-serif text-2xl font-semibold text-text">2. Prescription Medications</h2>
+                            <p className="text-base leading-relaxed text-text-muted">
+                                Jaya Medical Store operates in strict compliance with the Drugs and Cosmetics Act. Any order containing prescription medications (Schedule H/H1) will only be processed after a valid prescription from a registered medical practitioner is uploaded and verified by our licensed pharmacists. We reserve the right to cancel any order if the prescription is found to be invalid, expired, or fraudulent.
+                            </p>
+                        </section>
 
-                    <section className="space-y-4">
-                        <h2 className="font-display text-[28px] font-semibold text-on-background">4. Limitation of Liability</h2>
-                        <p className="text-[16px] leading-[1.7] text-on-surface-variant">
-                            Jaya Medical Store acts as a dispensing pharmacy. We are not liable for any adverse reactions, allergies, or side effects caused by the medications. Always consult your healthcare provider before starting any new medication.
-                        </p>
-                    </section>
+                        <section className="space-y-4">
+                            <h2 className="font-serif text-2xl font-semibold text-text">3. Pricing and Availability</h2>
+                            <p className="text-base leading-relaxed text-text-muted">
+                                All prices are listed in Indian Rupees (INR) and are inclusive of applicable taxes unless stated otherwise. Prices and availability of products are subject to change without notice. We make every effort to ensure accurate pricing, but in the event of a pricing error, we reserve the right to cancel the order and notify you.
+                            </p>
+                        </section>
 
-                    <section className="space-y-4">
-                        <h2 className="font-display text-[28px] font-semibold text-on-background">5. Changes to Terms</h2>
-                        <p className="text-[16px] leading-[1.7] text-on-surface-variant">
-                            We reserve the right to update or modify these Terms and Conditions at any time without prior notice. Your continued use of the website following any changes constitutes your acceptance of the new terms.
-                        </p>
-                    </section>
-                </motion.div>
+                        <section className="space-y-4">
+                            <h2 className="font-serif text-2xl font-semibold text-text">4. Delivery</h2>
+                            <p className="text-base leading-relaxed text-text-muted">
+                                We aim to deliver all local orders within the specified timeframes. However, delivery times are estimates and may be subject to delays due to unforeseen circumstances (e.g., severe weather, stock unavailability). We will communicate any significant delays to you promptly.
+                            </p>
+                        </section>
+
+                        <section className="space-y-4">
+                            <h2 className="font-serif text-2xl font-semibold text-text">5. Returns and Cancellations</h2>
+                            <p className="text-base leading-relaxed text-text-muted">
+                                Please refer to our Cancellation Policy for detailed information regarding order cancellations. Due to health and safety regulations, we do not accept returns on temperature-controlled medicines or opened products.
+                            </p>
+                        </section>
+                    </motion.div>
+                </div>
             </main>
         </>
     );
