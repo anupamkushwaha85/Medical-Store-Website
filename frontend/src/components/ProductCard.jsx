@@ -8,80 +8,100 @@ export default function ProductCard({ product }) {
     const { addToCart } = useCart();
     const discount = Math.max(0, Math.round(((product.mrp - product.price) / product.mrp) * 100));
 
-    const handleAddToCart = () => {
+    const handleAddToCart = (e) => {
+        e.preventDefault(); // Prevent navigating to product detail
         addToCart(product);
-        toast.success(`${product.name} added to cart.`);
+        toast.success(
+            <div className="flex items-center gap-2">
+                <div className="bg-primary/20 p-1 rounded-md">
+                    <img src={product.image} alt="" className="w-6 h-6 object-cover rounded" />
+                </div>
+                <span>Added to cart</span>
+            </div>
+        );
     };
 
     return (
         <motion.article
             whileHover={{ y: -6 }}
-            transition={{ type: 'spring', stiffness: 240, damping: 22 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+            className="h-full"
         >
-            <div className="group relative overflow-hidden rounded-[24px] border border-white/40 bg-white/35 shadow-[0_14px_40px_rgba(15,23,42,0.08)] backdrop-blur-2xl transition-all duration-300 hover:border-white/60 hover:bg-white/50 hover:shadow-[0_20px_50px_rgba(0,104,95,0.12)]">
-                <Link to={`/products/${product.id}`} className="block">
-                    {/* Image */}
-                    <div className="relative overflow-hidden bg-surface-container-low/50">
+            <div className="glass-card group flex flex-col h-full overflow-hidden transition-all duration-300 hover:shadow-2xl hover:border-primary/30 dark:hover:border-primary/50">
+                <Link to={`/products/${product.id}`} className="flex flex-col flex-grow">
+                    {/* Image Section */}
+                    <div className="relative overflow-hidden bg-bg-subtle aspect-square sm:aspect-[4/3] flex-shrink-0">
                         <img
                             src={product.image}
                             alt={product.name}
                             loading="lazy"
-                            className="h-56 w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                            className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
                         />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                        
                         {/* Badges */}
-                        <div className="absolute left-3 top-3 flex flex-col gap-1.5">
+                        <div className="absolute left-3 top-3 flex flex-col gap-2">
                             {discount > 0 && (
-                                <span className="rounded-full bg-primary px-3 py-1 text-[11px] font-bold text-white shadow-md">
+                                <span className="rounded-full bg-primary px-3 py-1 text-xs font-bold text-white shadow-md">
                                     {discount}% OFF
                                 </span>
                             )}
                             {product.requiresPrescription && (
-                                <span className="rounded-full bg-tertiary px-3 py-1 text-[11px] font-bold text-white shadow-md">
+                                <span className="rounded-full bg-secondary px-3 py-1 text-xs font-bold text-white shadow-md">
                                     Rx Required
                                 </span>
                             )}
                         </div>
+
+                        {/* Quick View Button (Desktop Hover) */}
+                        <div className="absolute inset-x-0 bottom-4 flex justify-center opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 pointer-events-none group-hover:pointer-events-auto">
+                            <span className="glass-button bg-white/90 dark:bg-zinc-800/90 text-text px-4 py-2 rounded-full shadow-lg text-xs font-medium backdrop-blur-md border border-border">
+                                <Icon name="Eye" className="w-4 h-4 mr-1" /> Quick View
+                            </span>
+                        </div>
                     </div>
 
-                    {/* Content */}
-                    <div className="space-y-3 p-5">
-                        <div>
-                            <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-primary">
-                                {product.category}
-                            </p>
-                            <h3 className="mt-1.5 font-display text-[20px] font-semibold leading-tight text-on-background">
-                                {product.name}
-                            </h3>
-                        </div>
-
-                        <p className="line-clamp-2 text-[13px] leading-[1.6] text-on-surface-variant">
+                    {/* Content Section */}
+                    <div className="flex flex-col flex-grow p-5">
+                        <p className="text-xs font-bold uppercase tracking-widest text-primary mb-2">
+                            {product.category}
+                        </p>
+                        <h3 className="font-serif text-xl font-semibold leading-tight text-text mb-2 line-clamp-2">
+                            {product.name}
+                        </h3>
+                        <p className="text-sm text-text-muted line-clamp-2 mb-4 flex-grow">
                             {product.description}
                         </p>
 
                         {/* Price */}
-                        <div className="flex items-end justify-between gap-3">
+                        <div className="flex items-end justify-between gap-3 mt-auto">
                             <div>
-                                <p className="text-[22px] font-bold text-on-background">₹{product.price}</p>
-                                <p className="text-[12px] text-on-surface-variant">
-                                    MRP <span className="line-through">₹{product.mrp}</span>
-                                </p>
+                                <p className="text-2xl font-bold text-text">₹{product.price}</p>
+                                {discount > 0 && (
+                                    <p className="text-xs text-text-muted mt-1">
+                                        MRP <span className="line-through">₹{product.mrp}</span>
+                                    </p>
+                                )}
                             </div>
-                            <span className="rounded-full border border-outline-variant/30 bg-surface-container-low px-2.5 py-1 text-[11px] font-semibold text-on-surface-variant">
+                            <span className="rounded-xl bg-bg-subtle border border-border px-3 py-1 text-xs font-medium text-text-muted">
                                 {product.brand}
                             </span>
                         </div>
                     </div>
                 </Link>
 
-                {/* Add to cart */}
-                <div className="border-t border-white/30 p-4">
+                {/* Add to cart Action */}
+                <div className="p-4 pt-0">
                     <button
                         type="button"
                         onClick={handleAddToCart}
-                        className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary px-4 py-3 text-[13px] font-semibold tracking-[0.03em] text-on-primary transition-all duration-300 hover:bg-primary-container hover:text-on-primary-container"
+                        className="w-full glass-button-primary rounded-xl py-3 justify-center group/btn relative overflow-hidden"
                     >
-                        <Icon name="ShoppingCart" className="h-4 w-4" />
-                        Add to Cart
+                        <span className="relative z-10 flex items-center justify-center gap-2">
+                            <Icon name="ShoppingCart" className="h-4 w-4 transition-transform group-hover/btn:scale-110" />
+                            Add to Cart
+                        </span>
+                        <div className="absolute inset-0 bg-white/20 translate-y-[100%] group-hover/btn:translate-y-0 transition-transform duration-300 ease-out" />
                     </button>
                 </div>
             </div>
