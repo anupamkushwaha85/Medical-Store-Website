@@ -78,20 +78,20 @@ export default function PrescriptionUpload() {
     };
 
     const inputBaseClass =
-        'w-full rounded-[14px] border border-outline-variant/40 bg-surface-container-lowest px-4 py-3.5 text-[15px] text-on-background outline-none transition-all duration-200 placeholder:text-outline/50 focus:border-primary focus:ring-2 focus:ring-primary/10';
+        'w-full rounded-xl border border-border bg-bg px-4 py-3.5 text-sm text-text outline-none transition-colors duration-200 placeholder:text-text-muted/50 focus:border-primary focus:ring-1 focus:ring-primary/20';
 
     return (
-        <div className="rounded-[32px] border border-outline-variant/30 bg-surface-container-lowest p-7 shadow-[0_20px_60px_rgba(0,104,95,0.06)] sm:p-9">
+        <div className="glass-card p-7 sm:p-9">
             {/* Header */}
             <div className="mb-8">
-                <span className="inline-flex items-center gap-1.5 text-[12px] font-bold uppercase tracking-[0.15em] text-primary">
+                <span className="kicker">
                     <Icon name="ClipboardList" className="h-3.5 w-3.5" />
                     Prescription Form
                 </span>
-                <h2 className="mt-3 font-display text-[28px] font-semibold leading-[1.2] text-on-background sm:text-[32px]">
-                    Share your prescription securely
+                <h2 className="display-heading text-3xl sm:text-4xl !mb-3">
+                    Share securely
                 </h2>
-                <p className="mt-3 max-w-lg text-[14px] leading-[1.7] text-on-surface-variant">
+                <p className="text-sm leading-relaxed text-text-muted">
                     Upload a JPG, PNG, or PDF and provide details so the pharmacy can prepare your order with care.
                 </p>
             </div>
@@ -105,32 +105,32 @@ export default function PrescriptionUpload() {
                     }}
                     onDragLeave={() => setDragActive(false)}
                     onDrop={handleDrop}
-                    className={`group relative rounded-[22px] border-2 border-dashed p-8 transition-all duration-300 ${
+                    className={`group relative rounded-2xl border-2 border-dashed p-8 transition-all duration-300 ${
                         dragActive
-                            ? 'border-primary bg-primary/[0.06] shadow-[0_0_0_4px_rgba(0,104,95,0.08)]'
+                            ? 'border-primary bg-primary/5'
                             : file
-                              ? 'border-primary/30 bg-primary/[0.03]'
-                              : 'border-outline-variant/50 bg-surface-container-low hover:border-primary/30 hover:bg-primary/[0.02]'
+                              ? 'border-primary/30 bg-primary/5'
+                              : 'border-border bg-bg-subtle hover:border-primary/30'
                     }`}
                 >
                     {!file ? (
                         <label className="flex cursor-pointer flex-col items-center justify-center gap-4 text-center">
-                            <span className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 text-primary transition-transform duration-300 group-hover:scale-105">
+                            <span className="flex h-16 w-16 items-center justify-center rounded-xl bg-primary/10 text-primary transition-transform duration-300 group-hover:scale-105 border border-primary/20">
                                 <Icon name="Upload" className="h-7 w-7" />
                             </span>
                             <div>
-                                <span className="text-[16px] font-semibold text-on-background">
+                                <span className="text-base font-medium text-text">
                                     Drop your prescription here
                                 </span>
-                                <span className="mt-1 block text-[13px] text-on-surface-variant">
-                                    or <span className="font-medium text-primary underline underline-offset-2">browse files</span> to upload
+                                <span className="mt-1 block text-sm text-text-muted">
+                                    or <span className="font-medium text-primary hover:underline underline-offset-2">browse files</span> to upload
                                 </span>
                             </div>
                             <div className="flex gap-2">
                                 {['JPG', 'PNG', 'PDF'].map((fmt) => (
                                     <span
                                         key={fmt}
-                                        className="rounded-full border border-outline-variant/30 bg-surface-container-lowest px-2.5 py-0.5 text-[11px] font-semibold text-on-surface-variant"
+                                        className="rounded-lg border border-border bg-bg px-2.5 py-1 text-[11px] font-bold uppercase tracking-widest text-text-muted shadow-sm"
                                     >
                                         {fmt}
                                     </span>
@@ -145,13 +145,13 @@ export default function PrescriptionUpload() {
                         </label>
                     ) : (
                         <div className="flex items-center justify-between gap-4">
-                            <div className="flex items-center gap-3">
-                                <div className="flex h-11 w-11 items-center justify-center rounded-[12px] bg-primary/10 text-primary">
-                                    <Icon name="FileText" className="h-5 w-5" />
+                            <div className="flex items-center gap-4">
+                                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary border border-primary/20">
+                                    <Icon name="FileText" className="h-6 w-6" />
                                 </div>
                                 <div>
-                                    <p className="text-[14px] font-semibold text-on-background">{file.name}</p>
-                                    <p className="text-[12px] text-on-surface-variant">
+                                    <p className="text-sm font-medium text-text line-clamp-1">{file.name}</p>
+                                    <p className="text-xs text-text-muted mt-0.5">
                                         {(file.size / 1024).toFixed(1)} KB · Ready to upload
                                     </p>
                                 </div>
@@ -159,7 +159,7 @@ export default function PrescriptionUpload() {
                             <button
                                 type="button"
                                 onClick={removeFile}
-                                className="flex h-9 w-9 items-center justify-center rounded-full border border-outline-variant/40 text-on-surface-variant transition-colors duration-200 hover:border-error/40 hover:bg-error/8 hover:text-error"
+                                className="flex h-10 w-10 items-center justify-center rounded-full bg-bg border border-border text-text-muted transition-colors duration-200 hover:border-red-500/30 hover:bg-red-500/10 hover:text-red-500"
                             >
                                 <Icon name="X" className="h-4 w-4" />
                             </button>
@@ -169,8 +169,8 @@ export default function PrescriptionUpload() {
 
                 {/* Name & Phone */}
                 <div className="grid gap-5 sm:grid-cols-2">
-                    <label className="space-y-2">
-                        <span className="text-[13px] font-semibold text-on-surface-variant">Patient Name</span>
+                    <label className="block space-y-2">
+                        <span className="text-xs font-bold uppercase tracking-widest text-text-muted">Patient Name</span>
                         <input
                             name="patient_name"
                             value={form.patient_name}
@@ -180,8 +180,8 @@ export default function PrescriptionUpload() {
                             className={inputBaseClass}
                         />
                     </label>
-                    <label className="space-y-2">
-                        <span className="text-[13px] font-semibold text-on-surface-variant">Phone Number</span>
+                    <label className="block space-y-2">
+                        <span className="text-xs font-bold uppercase tracking-widest text-text-muted">Phone Number</span>
                         <input
                             name="phone"
                             value={form.phone}
@@ -196,7 +196,7 @@ export default function PrescriptionUpload() {
 
                 {/* Address */}
                 <label className="block space-y-2">
-                    <span className="text-[13px] font-semibold text-on-surface-variant">Delivery Address</span>
+                    <span className="text-xs font-bold uppercase tracking-widest text-text-muted">Delivery Address</span>
                     <textarea
                         name="address"
                         value={form.address}
@@ -210,9 +210,9 @@ export default function PrescriptionUpload() {
 
                 {/* Notes */}
                 <label className="block space-y-2">
-                    <span className="flex items-center gap-1.5 text-[13px] font-semibold text-on-surface-variant">
+                    <span className="text-xs font-bold uppercase tracking-widest text-text-muted flex items-center gap-2">
                         Notes
-                        <span className="text-[11px] font-normal text-outline">(optional)</span>
+                        <span className="text-[10px] text-text-muted/60">(optional)</span>
                     </span>
                     <textarea
                         name="notes"
@@ -228,17 +228,17 @@ export default function PrescriptionUpload() {
                 <button
                     type="submit"
                     disabled={sending}
-                    className="inline-flex w-full items-center justify-center gap-2.5 rounded-full bg-primary px-8 py-4 text-[15px] font-semibold tracking-[0.03em] text-on-primary shadow-[0_10px_30px_rgba(0,104,95,0.18)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-primary-container hover:text-on-primary-container hover:shadow-[0_16px_40px_rgba(0,104,95,0.22)] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0 sm:w-auto"
+                    className="glass-button-primary w-full sm:w-auto px-10 py-4 justify-center mt-2"
                 >
                     {sending ? (
                         <>
-                            <Icon name="RefreshCw" className="h-4 w-4 animate-spin" />
+                            <Icon name="RefreshCw" className="h-4 w-4 animate-spin mr-2" />
                             Submitting...
                         </>
                     ) : (
                         <>
                             Submit Prescription
-                            <Icon name="ArrowRight" className="h-4 w-4" />
+                            <Icon name="ArrowRight" className="ml-2 h-4 w-4" />
                         </>
                     )}
                 </button>
