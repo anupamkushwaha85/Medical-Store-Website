@@ -4,17 +4,20 @@ import { BrowserRouter } from 'react-router-dom';
 import App from './App';
 import AppToaster from './components/Toast';
 import { CartProvider } from './context/CartContext';
+import { ThemeProvider } from './context/ThemeContext';
 import './index.css';
 
 const basename = import.meta.env.BASE_URL === '/' ? '/' : import.meta.env.BASE_URL.replace(/\/$/, '');
 
 ReactDOM.createRoot(document.getElementById('root')).render(
     <React.StrictMode>
-        <BrowserRouter basename={basename}>
+        <ThemeProvider>
             <CartProvider>
-                <App />
-                <AppToaster />
+                <BrowserRouter basename={basename}>
+                    <App />
+                    <AppToaster />
+                </BrowserRouter>
             </CartProvider>
-        </BrowserRouter>
+        </ThemeProvider>
     </React.StrictMode>,
 );
