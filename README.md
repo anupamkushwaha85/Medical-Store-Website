@@ -10,16 +10,14 @@
 
 </div>
 
-Modern full-stack medical store and pharmacy e-commerce monorepo built for product browsing, prescription uploads, cart flow, and online payments.
+> Modern full-stack medical store and pharmacy e-commerce monorepo supporting product browsing, prescription uploads, cart flow, and online payments.
 
 ## Highlights
 
-- React + Vite frontend for a fast, responsive shopping experience
-- Node.js + Express backend for APIs and business logic
-- MongoDB models for products, categories, and orders
-- Prescription upload and contact workflows
-- Razorpay integration for checkout
-- GitHub Actions deployment for the frontend app
+- Fast React + Vite frontend with Tailwind CSS
+- Node.js + Express API server with Mongoose models
+- Prescription upload flow and cart/checkout with Razorpay
+- Cloudinary for media, Firebase Admin for notifications, Redis for caching
 
 ## Tech Stack
 
@@ -29,45 +27,67 @@ Modern full-stack medical store and pharmacy e-commerce monorepo built for produ
 
 ## Repository Layout
 
-```text
+See the two main workspaces:
+
+```
 mmm-medical-shop/
-├── backend/
-└── frontend/
+├── backend/   # API server, models, controllers, routes
+└── frontend/  # React + Vite single-page app
 ```
 
-## Getting Started
+## Quick Start
 
-### Frontend
+Prerequisites: Node.js 18+ (LTS), npm, MongoDB (or Atlas).
+
+### Frontend (development)
 
 ```bash
 cd frontend
 npm install
-cp .env.example .env
+cp .env.example .env   # update EmailJS / public keys as needed
 npm run dev
 ```
 
-### Backend
+Build for production:
+
+```bash
+cd frontend
+npm run build
+```
+
+### Backend (development)
 
 ```bash
 cd backend
 npm install
-npm run dev
+cp .env.example .env   # populate DB, Cloudinary, Firebase, Razorpay secrets
+npm run dev            # uses nodemon if available
+```
+
+Start production server (example):
+
+```bash
+cd backend
+npm start
 ```
 
 ## Environment Variables
 
-Frontend EmailJS values are configured in `frontend/.env`.
+- `frontend/.env` — EmailJS and any public keys used by the client
+- `backend/.env` — MongoDB connection string, Cloudinary, Firebase service account, Razorpay keys, Redis URL, JWT secrets
 
-Backend secrets are configured in `backend/.env`.
+Provide values using the `.env.example` files in each workspace.
 
 ## Deployment
 
-The frontend is deployed with GitHub Actions from the repository root. The workflow builds `frontend/` and publishes `frontend/dist` to GitHub Pages.
+- Frontend: built from `frontend/` and can be deployed to static hosts (GitHub Pages, Netlify, Vercel).
+- Backend: deploy the `backend/` app to a Node-capable host (Heroku, Render, DigitalOcean App Platform, etc.).
 
-## Frontend Notes
+## Notes
 
-The detailed frontend documentation now lives in [frontend/FRONTEND_README.md](frontend/FRONTEND_README.md).
+- See [frontend/FRONTEND_README.md](frontend/FRONTEND_README.md) for detailed frontend information.
+- This repository contains sensitive configuration placeholders; do not commit real secrets.
 
 ## License
 
-Proprietary project. All rights reserved unless a separate license is added later.
+Proprietary — all rights reserved unless a license is added.
