@@ -76,7 +76,7 @@ export default function FAQ() {
                         className="mt-16 text-center glass-card p-8 bg-primary/5 border-primary/20"
                     >
                         <h3 className="font-serif text-2xl mb-3 text-text">Still have questions?</h3>
-                        <p className="text-text-muted mb-6">Can't find the answer you're looking for? Please contact our friendly team.</p>
+                        <p className="text-text-muted mb-6">Can't find the answer you're looking for? Please contact our friendly team. </p>
                         <a href="/contact" className="glass-button-primary inline-flex">
                             Get in Touch
                         </a>
