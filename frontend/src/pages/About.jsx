@@ -26,7 +26,7 @@ export default function About() {
                             A pharmacy shaped around <span className="text-primary italic font-normal">trust</span> and attention.
                         </h1>
                         <p className="mt-6 text-lg leading-relaxed text-text-muted text-balance">
-                            Jaya Medical Store is built to feel like a clean, welcoming pharmacy counter online. The goal is simple: genuine products, careful verification, and a service experience that helps people feel informed rather than rushed.
+                            Jaya Medical Store is built to feel like a clean, welcoming pharmacy counter online. The goal is simple:- genuine products, careful verification, and a service experience that helps people feel informed rather than rushed.
                         </p>
                     </motion.div>
 
