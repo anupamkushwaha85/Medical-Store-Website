@@ -44,7 +44,6 @@ jobs:
         env:
           VITE_EMAILJS_SERVICE_ID: ${{ secrets.VITE_EMAILJS_SERVICE_ID }}
           VITE_EMAILJS_CONTACT_TEMPLATE: ${{ secrets.VITE_EMAILJS_CONTACT_TEMPLATE }}
-          VITE_EMAILJS_PRESCRIPTION_TEMPLATE: ${{ secrets.VITE_EMAILJS_PRESCRIPTION_TEMPLATE }}
           VITE_EMAILJS_PUBLIC_KEY: ${{ secrets.VITE_EMAILJS_PUBLIC_KEY }}
 
       - name: Upload artifact
