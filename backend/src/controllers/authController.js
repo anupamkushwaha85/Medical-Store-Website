@@ -1,20 +1,33 @@
-import jwt from 'jsonwebtoken';
 import { asyncHandler, Errors } from '../utils/errors.js';
+import { getAdminSessionName, getAdminSessionSameSite } from '../config/session.js';
+
+const promisifySessionAction = (action) => new Promise((resolve, reject) => {
+    action((error) => {
+        if (error) {
+            reject(error);
+            return;
+        }
+
+        resolve();
+    });
+});
+
+const clearCookieOptions = () => ({
+    path: '/',
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: getAdminSessionSameSite(),
+});
 
 /**
  * Admin login
- * POST /api/admin/login
+ * POST /api/admin/session/login
  */
 export const adminLogin = asyncHandler(async (req, res) => {
     const { username, password } = req.body;
 
     const adminUsername = process.env.ADMIN_USERNAME;
     const adminPassword = process.env.ADMIN_PASSWORD;
-    const jwtSecret = process.env.JWT_SECRET;
-
-    if (!jwtSecret) {
-        throw Errors.internal('JWT_SECRET is not configured on the server');
-    }
 
     if (!adminUsername || !adminPassword) {
         throw Errors.internal('Admin credentials are not configured on the server');
@@ -24,15 +37,49 @@ export const adminLogin = asyncHandler(async (req, res) => {
         throw Errors.unauthorized('Invalid admin credentials');
     }
 
-    const token = jwt.sign(
-        { username, role: 'admin' },
-        jwtSecret,
-        { expiresIn: '24h' }
-    );
+    if (!req.session) {
+        throw Errors.internal('Session middleware is not configured');
+    }
+
+    await promisifySessionAction((done) => req.session.regenerate(done));
+
+    req.session.admin = {
+        username,
+        loggedInAt: new Date().toISOString(),
+    };
+
+    await promisifySessionAction((done) => req.session.save(done));
 
     res.json({
         success: true,
-        token,
-        expiresIn: '24h'
+        admin: req.session.admin,
+    });
+});
+
+export const getAdminSession = asyncHandler(async (req, res) => {
+    if (!req.session?.admin?.username) {
+        throw Errors.unauthorized('Admin session not found');
+    }
+
+    res.json({
+        success: true,
+        admin: req.session.admin,
+    });
+});
+
+export const adminLogout = asyncHandler(async (req, res) => {
+    const sessionName = getAdminSessionName();
+
+    if (!req.session) {
+        return res.json({ success: true, message: 'Admin logged out' });
+    }
+
+    await promisifySessionAction((done) => req.session.destroy(done));
+
+    res.clearCookie(sessionName, clearCookieOptions());
+
+    res.json({
+        success: true,
+        message: 'Admin logged out',
     });
 });
