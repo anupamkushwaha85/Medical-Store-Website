@@ -19,6 +19,7 @@ const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
 const TermsConditions = lazy(() => import('./pages/TermsConditions'));
 const CancelOrder = lazy(() => import('./pages/CancelOrder'));
 const NotFound = lazy(() => import('./pages/NotFound'));
+const AdminOwnerAshutosh = lazy(() => import('./pages/AdminOwnerAshutosh'));
 
 function ScrollToTop() {
     const location = useLocation();
@@ -62,6 +63,7 @@ function Layout() {
 export default function App() {
     return (
         <Routes>
+            <Route path="admin/owner/ashutosh" element={<AdminOwnerAshutosh />} />
             <Route element={<Layout />}>
                 <Route index element={<Home />} />
                 <Route path="products" element={<Products />} />
