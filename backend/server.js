@@ -5,6 +5,7 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
+import { createAdminSessionMiddleware } from './src/config/session.js';
 import { connectDB } from './src/config/db.js';
 import { initFirebase } from './src/config/firebase.js';
 import { connectCloudinary } from './src/config/cloudinary.js';
@@ -22,7 +23,9 @@ import adminRoutes from './src/routes/adminRoutes.js';
 // ─── Environment Validation ───────────────────────────────────────────────────
 const validateEnv = () => {
     const optionalEnvVars = [
+        'SESSION_SECRET',
         'JWT_SECRET',
+        'ADMIN_SESSION_NAME',
         'ADMIN_USERNAME',
         'ADMIN_PASSWORD',
         'UPSTASH_REDIS_REST_URL',
@@ -42,6 +45,7 @@ validateEnv();
 
 // ─── Initialization ───────────────────────────────────────────────────────────
 const app = express();
+app.set('trust proxy', 1);
 
 // Database and External Services
 connectDB();
@@ -50,7 +54,7 @@ connectCloudinary();
 connectRedis();
 
 // ─── Middlewares ──────────────────────────────────────────────────────────────
-const allowedOrigins = process.env.CLIENT_URL 
+const allowedOrigins = process.env.CLIENT_URL
     ? process.env.CLIENT_URL.split(',').map(url => url.trim())
     : ['http://localhost:5173'];
 
@@ -60,6 +64,7 @@ app.use(cors({
 }));
 
 app.use(helmet());
+app.use(createAdminSessionMiddleware());
 
 // Logging
 if (process.env.NODE_ENV === 'development') {
@@ -86,6 +91,18 @@ app.get('/api/health', (req, res) => {
         uptime: process.uptime(),
         environment: process.env.NODE_ENV
     });
+});
+
+app.head('/api/health', (req, res) => {
+    res.sendStatus(200);
+});
+
+app.get('/healthz', (req, res) => {
+    res.status(200).send('ok');
+});
+
+app.head('/healthz', (req, res) => {
+    res.sendStatus(200);
 });
 
 app.use('/api/auth', authRoutes);
