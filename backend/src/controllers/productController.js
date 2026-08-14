@@ -77,6 +77,11 @@ export const getProducts = asyncHandler(async (req, res) => {
 
     const filter = {};
 
+    // Only show active products for public requests (no admin token)
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        filter.is_active = true;
+    }
 
     if (category && mongoose.Types.ObjectId.isValid(category)) {
         filter.category = category;
@@ -163,10 +168,9 @@ export const updateProduct = asyncHandler(async (req, res) => {
         // Delete old image from Cloudinary if it exists and is not a default placeholder
         if (product.image_url && product.image_url.includes('cloudinary')) {
             try {
-                // Extract public ID from URL
                 const urlParts = product.image_url.split('/');
                 const filename = urlParts[urlParts.length - 1];
-                const publicId = `jaya_medical/products/${filename.split('.')[0]}`;
+                const publicId = `products/${filename.split('.')[0]}`;
                 await cloudinary.uploader.destroy(publicId);
             } catch (err) {
                 console.error('Failed to delete old image from Cloudinary:', err);
@@ -177,10 +181,17 @@ export const updateProduct = asyncHandler(async (req, res) => {
         const b64 = Buffer.from(req.file.buffer).toString('base64');
         let dataURI = 'data:' + req.file.mimetype + ';base64,' + b64;
         const uploadRes = await cloudinary.uploader.upload(dataURI, {
-            folder: 'jaya_medical/products'
+            folder: 'products'
         });
 
         updateData.image_url = uploadRes.secure_url;
+    }
+
+    // Recalculate discount percentage (pre-save hook doesn't run on findByIdAndUpdate)
+    const finalMarked = Number(updateData.marked_price) || product.marked_price;
+    const finalSelling = Number(updateData.selling_price) || product.selling_price;
+    if (finalMarked && finalSelling) {
+        updateData.discount_percentage = Math.max(0, Math.round(((finalMarked - finalSelling) / finalMarked) * 100));
     }
 
     const updatedProduct = await Product.findByIdAndUpdate(
@@ -215,7 +226,7 @@ export const deleteProduct = asyncHandler(async (req, res) => {
         try {
             const urlParts = product.image_url.split('/');
             const filename = urlParts[urlParts.length - 1];
-            const publicId = `jaya_medical/products/${filename.split('.')[0]}`;
+            const publicId = `products/${filename.split('.')[0]}`;
             await cloudinary.uploader.destroy(publicId);
         } catch (err) {
             console.error('Failed to delete image from Cloudinary:', err);

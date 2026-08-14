@@ -46,6 +46,11 @@ export const normalizeProduct = (product) => {
         composition: product.composition || product.brand || '',
         stock: product.stock ?? 0,
         is_active: product.is_active ?? true,
+        uses: product.uses || [],
+        sideEffects: product.sideEffects || [],
+        directions: product.directions || [],
+        details: product.description || 'Quality pharmaceutical product from Jaya Medical Store.',
+        manufacturer: product.brand || 'Generic',
     };
 };
 

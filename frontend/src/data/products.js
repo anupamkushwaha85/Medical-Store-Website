@@ -136,16 +136,5 @@ export const contactSubjects = [
 ];
 
 export const products = [];
-
-export const defaultCategories = [
-    'Medicines',
-    'Vitamins & Supplements',
-    'Personal Care',
-    'Baby Care',
-    'Diabetic Care',
-    'Surgical Supplies'
-];
-
-export const productCategories = ['All', ...defaultCategories];
 export const productBrands = ['All', 'Micro Labs', 'Dr. Reddy\'s', 'Cipla', 'Abbott', 'Himalaya', 'Apollo', 'Romsons'];
 export const productGroups = {};
