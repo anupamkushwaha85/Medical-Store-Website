@@ -174,17 +174,49 @@ export default function AdminOwnerAshutosh() {
         }
     };
 
+    const MAX_IMAGE_SIZE = 1 * 1024 * 1024; // 1MB
+
+    const [imagePreview, setImagePreview] = useState(null);
+    const [imageSizeInfo, setImageSizeInfo] = useState('');
+
     const handleProductField = (event) => {
         const { name, value, type, checked, files } = event.target;
 
+        if (name === 'image') {
+            const file = files?.[0];
+            if (file) {
+                if (file.size > MAX_IMAGE_SIZE) {
+                    const sizeMb = (file.size / (1024 * 1024)).toFixed(2);
+                    toast.error(`Selected image (${sizeMb} MB) exceeds 1MB limit! Please choose an image smaller than 1MB.`);
+                    event.target.value = '';
+                    setImagePreview(null);
+                    setImageSizeInfo('');
+                    setProductForm((current) => ({ ...current, image: null }));
+                    return;
+                }
+
+                const sizeKb = (file.size / 1024).toFixed(0);
+                setImageSizeInfo(`${sizeKb} KB (Valid < 1MB limit)`);
+                setImagePreview(URL.createObjectURL(file));
+                setProductForm((current) => ({ ...current, image: file }));
+            } else {
+                setImagePreview(null);
+                setImageSizeInfo('');
+                setProductForm((current) => ({ ...current, image: null }));
+            }
+            return;
+        }
+
         setProductForm((current) => ({
             ...current,
-            [name]: type === 'checkbox' ? checked : name === 'image' ? files?.[0] || null : value,
+            [name]: type === 'checkbox' ? checked : value,
         }));
     };
 
     const resetProductForm = () => {
         setEditingProductId(null);
+        setImagePreview(null);
+        setImageSizeInfo('');
         setProductForm((current) => ({
             ...initialProduct,
             category: current.category || categories[0]?._id || '',
@@ -194,6 +226,8 @@ export default function AdminOwnerAshutosh() {
     const editProduct = (product) => {
         setActiveTab('products');
         setEditingProductId(product._id);
+        setImagePreview(product.image_url || null);
+        setImageSizeInfo('Current active image');
         setProductForm({
             name: product.name || '',
             brand: product.brand || '',
@@ -217,7 +251,12 @@ export default function AdminOwnerAshutosh() {
         }
 
         if (!editingProductId && !productForm.image) {
-            toast.error('Choose a product image');
+            toast.error('Choose a product image (< 1MB)');
+            return;
+        }
+
+        if (productForm.image && productForm.image.size > MAX_IMAGE_SIZE) {
+            toast.error('Image size must be less than 1MB.');
             return;
         }
 
@@ -244,7 +283,9 @@ export default function AdminOwnerAshutosh() {
                 body: formData,
             });
 
-            toast.success(editingProductId ? 'Product updated' : 'Product created');
+            toast.success(editingProductId ? 'Product updated successfully' : 'Product created successfully');
+            setImagePreview(null);
+            setImageSizeInfo('');
             setProductForm((current) => ({
                 ...initialProduct,
                 category: current.category || categories[0]?._id || '',
@@ -512,23 +553,37 @@ export default function AdminOwnerAshutosh() {
                         </div>
 
                         <form onSubmit={submitProduct} className="mt-6 grid gap-4 md:grid-cols-2">
-                            <label className="block md:col-span-2">
-                                <span className="text-sm font-medium text-slate-700">Product image</span>
+                            <div className="block md:col-span-2">
+                                <div className="flex items-center justify-between">
+                                    <span className="text-sm font-medium text-slate-700">Product Image (1 Image Per Product)</span>
+                                    <span className="text-xs font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 border border-emerald-200">Limit: &lt; 1MB</span>
+                                </div>
                                 <input
                                     type="file"
                                     name="image"
-                                    accept="image/*"
+                                    accept="image/jpeg,image/png,image/webp,image/gif"
                                     onChange={handleProductField}
-                                    className="mt-2 w-full border border-slate-200 bg-[#fafaf8] px-4 py-3 text-sm"
+                                    className="mt-2 w-full border border-slate-200 bg-[#fafaf8] px-4 py-3 text-sm focus:border-slate-900"
                                 />
-                            </label>
+                                <p className="mt-1 text-xs text-slate-500">Only 1 image accepted per product. Maximum size strictly less than 1MB (1,048,576 bytes).</p>
+
+                                {imagePreview ? (
+                                    <div className="mt-3 flex items-center gap-4 border border-slate-200 bg-[#fbfbf9] p-3">
+                                        <img src={imagePreview} alt="Preview" className="h-16 w-16 object-cover border border-slate-300 bg-white" />
+                                        <div>
+                                            <p className="text-xs font-semibold uppercase tracking-wider text-slate-700">Image Preview</p>
+                                            <p className="text-xs text-emerald-600 font-medium mt-0.5">{imageSizeInfo || 'Selected file valid'}</p>
+                                        </div>
+                                    </div>
+                                ) : null}
+                            </div>
 
                             {[
                                 ['name', 'Product name'],
                                 ['brand', 'Brand'],
-                                ['marked_price', 'Marked price'],
-                                ['selling_price', 'Selling price'],
-                                ['stock', 'Stock'],
+                                ['marked_price', 'Marked price (₹)'],
+                                ['selling_price', 'Selling price (₹)'],
+                                ['stock', 'Stock quantity'],
                             ].map(([field, label]) => (
                                 <label key={field} className="block">
                                     <span className="text-sm font-medium text-slate-700">{label}</span>
@@ -538,7 +593,7 @@ export default function AdminOwnerAshutosh() {
                                         onChange={handleProductField}
                                         type={['marked_price', 'selling_price', 'stock'].includes(field) ? 'number' : 'text'}
                                         min={field === 'stock' ? '0' : undefined}
-                                        className="mt-2 w-full border border-slate-200 bg-[#fafaf8] px-4 py-3 outline-none transition focus:border-slate-900"
+                                        className="mt-2 w-full border border-slate-200 bg-[#fafaf8] px-4 py-3 outline-none transition focus:border-slate-900 text-sm"
                                     />
                                 </label>
                             ))}
@@ -549,7 +604,7 @@ export default function AdminOwnerAshutosh() {
                                     name="category"
                                     value={productForm.category}
                                     onChange={handleProductField}
-                                    className="mt-2 w-full border border-slate-200 bg-[#fafaf8] px-4 py-3 outline-none transition focus:border-slate-900"
+                                    className="mt-2 w-full border border-slate-200 bg-[#fafaf8] px-4 py-3 outline-none transition focus:border-slate-900 text-sm"
                                 >
                                     <option value="">Select a category</option>
                                     {categories.map((category) => (
@@ -565,7 +620,7 @@ export default function AdminOwnerAshutosh() {
                                     value={productForm.description}
                                     onChange={handleProductField}
                                     rows="3"
-                                    className="mt-2 w-full border border-slate-200 bg-[#fafaf8] px-4 py-3 outline-none transition focus:border-slate-900"
+                                    className="mt-2 w-full border border-slate-200 bg-[#fafaf8] px-4 py-3 outline-none transition focus:border-slate-900 text-sm"
                                 />
                             </label>
 
@@ -576,7 +631,7 @@ export default function AdminOwnerAshutosh() {
                                     value={productForm.composition}
                                     onChange={handleProductField}
                                     rows="2"
-                                    className="mt-2 w-full border border-slate-200 bg-[#fafaf8] px-4 py-3 outline-none transition focus:border-slate-900"
+                                    className="mt-2 w-full border border-slate-200 bg-[#fafaf8] px-4 py-3 outline-none transition focus:border-slate-900 text-sm"
                                 />
                             </label>
 
@@ -588,16 +643,16 @@ export default function AdminOwnerAshutosh() {
                                     onChange={handleProductField}
                                     className="h-4 w-4 border-slate-300 text-slate-900 focus:ring-slate-900"
                                 />
-                                <span className="text-sm text-slate-700">Prescription required</span>
+                                <span className="text-sm text-slate-700 font-medium">Prescription required (Rx)</span>
                             </label>
 
                             <div className="md:col-span-2 flex items-center gap-3 pt-2">
                                 <button
                                     type="submit"
                                     disabled={savingProduct}
-                                    className="border border-slate-900 bg-slate-900 px-5 py-3 text-sm font-medium text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
+                                    className="border border-slate-900 bg-slate-900 px-6 py-3 text-sm font-medium text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
                                 >
-                                    {savingProduct ? 'Saving' : editingProductId ? 'Update product' : 'Add product'}
+                                    {savingProduct ? 'Saving...' : editingProductId ? 'Update product' : 'Add product'}
                                 </button>
 
                                 <button
@@ -624,7 +679,7 @@ export default function AdminOwnerAshutosh() {
                                 value={categoryName}
                                 onChange={(event) => setCategoryName(event.target.value)}
                                 placeholder="New category name"
-                                className="flex-1 border border-slate-200 bg-[#fafaf8] px-4 py-3 outline-none transition focus:border-slate-900"
+                                className="flex-1 border border-slate-200 bg-[#fafaf8] px-4 py-3 outline-none transition focus:border-slate-900 text-sm"
                             />
                             <button
                                 type="submit"
@@ -673,6 +728,7 @@ export default function AdminOwnerAshutosh() {
                         <table className="min-w-full text-left text-sm">
                             <thead className="border-b border-slate-200 text-xs uppercase tracking-[0.22em] text-slate-400">
                                 <tr>
+                                    <th className="px-3 py-3 font-medium">Image</th>
                                     <th className="px-3 py-3 font-medium">Name</th>
                                     <th className="px-3 py-3 font-medium">Category</th>
                                     <th className="px-3 py-3 font-medium">Price</th>
@@ -683,10 +739,17 @@ export default function AdminOwnerAshutosh() {
                             </thead>
                             <tbody>
                                 {products.map((product) => (
-                                    <tr key={product._id} className="border-b border-slate-100 align-top">
+                                    <tr key={product._id} className="border-b border-slate-100 align-middle">
+                                        <td className="px-3 py-4">
+                                            <img
+                                                src={product.image_url || 'https://placehold.co/100x100?text=No+Image'}
+                                                alt={product.name}
+                                                className="h-12 w-12 object-cover border border-slate-200 rounded"
+                                            />
+                                        </td>
                                         <td className="px-3 py-4">
                                             <p className="font-medium text-slate-900">{product.name}</p>
-                                            <p className="mt-1 text-xs text-slate-500">{product.brand}</p>
+                                            <p className="mt-0.5 text-xs text-slate-500">{product.brand}</p>
                                         </td>
                                         <td className="px-3 py-4 text-slate-700">{product.category?.name || product.category?.slug || '—'}</td>
                                         <td className="px-3 py-4 text-slate-700">

@@ -63,6 +63,7 @@ function Layout() {
 export default function App() {
     return (
         <Routes>
+            <Route path="admin" element={<AdminOwnerAshutosh />} />
             <Route path="admin/owner/ashutosh" element={<AdminOwnerAshutosh />} />
             <Route element={<Layout />}>
                 <Route index element={<Home />} />
