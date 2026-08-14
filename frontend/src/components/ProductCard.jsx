@@ -1,11 +1,16 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useCart } from '../context/CartContext';
+import { normalizeProduct } from '../lib/productAdapter';
 import toast from 'react-hot-toast';
 import Icon from './Icons';
 
-export default function ProductCard({ product }) {
+export default function ProductCard({ product: rawProduct }) {
+    const product = normalizeProduct(rawProduct);
     const { addToCart } = useCart();
+    
+    if (!product) return null;
+
     const discount = Math.max(0, Math.round(((product.mrp - product.price) / product.mrp) * 100));
 
     const handleAddToCart = (e) => {
