@@ -6,7 +6,6 @@ import ProductCard from '../components/ProductCard';
 import Icon from '../components/Icons';
 import { apiRequest } from '../lib/api';
 import { normalizeProducts } from '../lib/productAdapter';
-import { defaultCategories } from '../data/products';
 
 const sortOptions = [
     { value: 'popular', label: 'Popularity' },
@@ -17,7 +16,7 @@ const sortOptions = [
 
 export default function Products() {
     const [searchParams] = useSearchParams();
-    const [search, setSearch] = useState('');
+    const [search, setSearch] = useState(searchParams.get('search') || searchParams.get('q') || '');
     const [category, setCategory] = useState(searchParams.get('category') || 'All');
     const [brand, setBrand] = useState('All');
     const [sortBy, setSortBy] = useState('popular');
@@ -68,7 +67,7 @@ export default function Products() {
     }, [searchParams]);
 
     const categoryList = useMemo(() => {
-        const set = new Set(['All', ...fetchedCategories, ...defaultCategories]);
+        const set = new Set(['All', ...fetchedCategories]);
         return Array.from(set);
     }, [fetchedCategories]);
 

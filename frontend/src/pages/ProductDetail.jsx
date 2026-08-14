@@ -284,9 +284,9 @@ export default function ProductDetail() {
                                             className="text-base leading-relaxed text-text-muted absolute inset-0"
                                         >
                                             {activeTab === 'details' && <p>{product.details}</p>}
-                                            {activeTab === 'uses' && <ListBlock items={product.uses} />}
-                                            {activeTab === 'sideEffects' && <ListBlock items={product.sideEffects} />}
-                                            {activeTab === 'directions' && <ListBlock items={product.directions} />}
+                                            {activeTab === 'uses' && <ListBlock items={product.uses || []} />}
+                                            {activeTab === 'sideEffects' && <ListBlock items={product.sideEffects || []} />}
+                                            {activeTab === 'directions' && <ListBlock items={product.directions || []} />}
                                         </motion.div>
                                     </AnimatePresence>
                                 </div>
@@ -330,6 +330,9 @@ export default function ProductDetail() {
 }
 
 function ListBlock({ items }) {
+    if (!(items && items.length > 0)) {
+        return <p className="text-text-muted italic">No information available for this section.</p>;
+    }
     return (
         <ul className="space-y-4">
             {items.map((item) => (
