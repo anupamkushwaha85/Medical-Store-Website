@@ -5,16 +5,18 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Jaya Medical Store</title>
-    <script>
-        // Single Page Application route redirect for GitHub Pages
-        (function () {
-            var l = window.location;
-            var route = l.pathname + l.search + l.hash;
-            try {
-                sessionStorage.setItem('ghp_redirect', route);
-            } catch (e) {}
-            l.replace(l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') + '/');
-        })();
+    <script type="text/javascript">
+        // Single Page Apps for GitHub Pages
+        // https://github.com/rafgraph/spa-github-pages
+        var pathSegmentsToKeep = 0;
+        var l = window.location;
+        l.replace(
+            l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
+            l.pathname.split('/').slice(0, 1 + pathSegmentsToKeep).join('/') + '/?p=' +
+            encodeURIComponent(l.pathname.slice(1).replace(/&/g, '~and~')) +
+            (l.search ? '&q=' + encodeURIComponent(l.search.slice(1).replace(/&/g, '~and~')) : '') +
+            l.hash
+        );
     </script>
 </head>
 
