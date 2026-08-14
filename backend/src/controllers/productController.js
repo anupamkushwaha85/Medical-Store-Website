@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import Product from '../models/Product.js';
 import cloudinary from '../config/cloudinary.js';
 import { asyncHandler, Errors } from '../utils/errors.js';
@@ -18,19 +19,39 @@ export const createProduct = asyncHandler(async (req, res) => {
 
     // Upload image to Cloudinary
     const b64 = Buffer.from(req.file.buffer).toString('base64');
-    let dataURI = 'data:' + req.file.mimetype + ';base64,' + b64;
-    const uploadRes = await cloudinary.uploader.upload(dataURI, {
-        folder: 'jaya_medical/products'
+    const dataURI = `data:${req.file.mimetype};base64,${b64}`;
+    
+    const uploadResponse = await cloudinary.uploader.upload(dataURI, {
+        folder: 'products',
+        resource_type: 'image',
     });
 
-    const productData = {
-        ...req.body,
-        image_url: uploadRes.secure_url,
-    };
+    const {
+        name,
+        brand,
+        marked_price,
+        selling_price,
+        requires_prescription,
+        category,
+        description,
+        composition,
+        stock
+    } = req.body;
 
-    const product = await Product.create(productData);
+    const product = await Product.create({
+        name,
+        brand,
+        image_url: uploadResponse.secure_url,
+        marked_price: Number(marked_price),
+        selling_price: Number(selling_price),
+        requires_prescription: requires_prescription === 'true' || requires_prescription === true,
+        category,
+        description,
+        composition,
+        stock: Number(stock) || 0
+    });
 
-    // Invalidate product listing caches
+    // Invalidate product list caches
     await cacheInvalidatePattern('products_*');
 
     res.status(201).json({
@@ -56,16 +77,8 @@ export const getProducts = asyncHandler(async (req, res) => {
 
     const filter = {};
 
-    // Filter by active products by default (if we were for public, but let's assume this returns all for now or modify based on user)
-    // We can just keep it simple: return active products for public, all for admin.
-    // Assuming this endpoint is public, we should only return active products.
-    // But since it's the only get list endpoint, let's keep it general, or check if admin.
-    // If not admin, add { is_active: true }
-    // Since req.user isn't available easily here without changing middleware, let's just use filter.
-    // Let's assume frontend wants only active products if not admin, but for now we'll just return based on query or all.
-    // Actually, let's just return what's in DB.
 
-    if (category) {
+    if (category && mongoose.Types.ObjectId.isValid(category)) {
         filter.category = category;
     }
 
