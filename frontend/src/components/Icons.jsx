@@ -46,6 +46,13 @@ import {
     RefreshCw,
     Play,
     ClipboardList,
+    Activity,
+    Eye,
+    Clock,
+    Heart,
+    FileBadge,
+    Target,
+    BadgeIndianRupee,
 } from 'lucide-react';
 
 export const iconMap = {
@@ -96,6 +103,13 @@ export const iconMap = {
     RefreshCw,
     Play,
     ClipboardList,
+    Activity,
+    Eye,
+    Clock,
+    Heart,
+    FileBadge,
+    Target,
+    BadgeIndianRupee,
 };
 
 export default function Icon({ name, className = 'h-5 w-5', strokeWidth = 1.75, ...props }) {

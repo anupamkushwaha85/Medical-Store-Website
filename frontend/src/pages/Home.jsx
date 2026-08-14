@@ -1,49 +1,18 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import Icon from '../components/Icons';
 import Seo from '../components/Seo';
+import ProductCard from '../components/ProductCard';
+import { apiRequest } from '../lib/api';
+import { normalizeProducts } from '../lib/productAdapter';
 
 const trustBadges = [
     { title: 'Licensed Pharmacy', icon: 'ShieldCheck' },
     { title: '100% Genuine Medicines', icon: 'BadgeCheck' },
     { title: 'Same-Day Delivery', icon: 'Truck' },
     { title: 'Expert Consultation', icon: 'Stethoscope' },
-];
-
-const collectionCards = [
-    {
-        title: 'Medicines',
-        description: 'Comprehensive pharmaceutical care, sourced strictly from certified global manufacturers.',
-        image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuD49expR2znvOL7qB6D50TlQBdUgtizsNudzj-6pxZGO_xZrwBSXCI1tLClB139tPjeUY_6-RSdQsD2yhhpf6tFZUFPtMIZcmQ3iUjYJeTAecFa620xx8QxFyaHHsMNNf3AonnjuGpd0y77rbEOkY7l7F50mTmls8pk6ZxEDa7fE9AnmeJB696HS79j8t4SKKfVK3E9iARcmCICR6Wg7twzL2tpHP2awMzcL4kiuvmSHTqft11KiDbtkgPbSfVIqFLIWaG7FLo1xN4',
-        large: true,
-    },
-    {
-        title: 'Vitamins',
-        description: 'Daily nutritional support.',
-        image: import.meta.env.BASE_URL + 'images/vitamins.webp',
-    },
-    {
-        title: 'Personal Care',
-        description: 'Premium hygiene essentials.',
-        image: import.meta.env.BASE_URL + 'images/personalcare.webp',
-    },
-    {
-        title: 'Baby Care',
-        description: 'Gentle pediatric solutions.',
-        image: import.meta.env.BASE_URL + 'images/babycare.webp',
-    },
-    {
-        title: 'Diabetic Care',
-        description: 'Monitoring and management.',
-        image: import.meta.env.BASE_URL + 'images/diabeticcare.webp',
-    },
-    {
-        title: 'Cough & Cold',
-        description: 'Relief for coughs, colds, and respiratory discomfort.',
-        image: import.meta.env.BASE_URL + 'images/coughandcold.webp',
-    },
 ];
 
 const processSteps = [
@@ -79,13 +48,68 @@ const staggerContainer = {
     }
 };
 
+// Category icon mapping for dynamic categories
+const categoryIconMap = {
+    'medicines': 'Pill',
+    'vitamins': 'Sparkles',
+    'vitamins & supplements': 'Sparkles',
+    'personal care': 'Sparkles',
+    'baby care': 'Baby',
+    'diabetic care': 'Droplets',
+    'surgical supplies': 'Bandage',
+    'cough & cold': 'Stethoscope',
+};
+
+const getCategoryIcon = (name) => {
+    return categoryIconMap[name.toLowerCase()] || 'Pill';
+};
+
 export default function Home() {
+    const navigate = useNavigate();
     const [newsletterEmail, setNewsletterEmail] = useState('');
+    const [heroSearch, setHeroSearch] = useState('');
+    const [featuredProducts, setFeaturedProducts] = useState([]);
+    const [liveCategories, setLiveCategories] = useState([]);
+    const [loadingProducts, setLoadingProducts] = useState(true);
+
+    useEffect(() => {
+        const loadHomeData = async () => {
+            try {
+                const [productRes, categoryRes] = await Promise.all([
+                    apiRequest('/api/products?limit=8').catch(() => ({ products: [] })),
+                    apiRequest('/api/categories').catch(() => ({ categories: [] })),
+                ]);
+
+                if (productRes?.products) {
+                    setFeaturedProducts(normalizeProducts(productRes.products));
+                }
+                if (categoryRes?.categories) {
+                    setLiveCategories(categoryRes.categories);
+                }
+            } catch (err) {
+                console.error('Failed to load home data:', err);
+            } finally {
+                setLoadingProducts(false);
+            }
+        };
+
+        loadHomeData();
+    }, []);
 
     const handleSubscribe = (event) => {
         event.preventDefault();
         toast.success('Newsletter signup submitted.');
         setNewsletterEmail('');
+    };
+
+    const handleHeroSearch = (event) => {
+        event.preventDefault();
+        const q = heroSearch.trim();
+        if (q) {
+            navigate(`/products?search=${encodeURIComponent(q)}`);
+        } else {
+            navigate('/products');
+        }
     };
 
     return (
@@ -150,11 +174,13 @@ export default function Home() {
                             </Link>
                         </div>
 
-                        <form className="mt-6 w-full md:max-w-none md:mr-[-14%] lg:mr-[-18%]" style={{ minWidth: '100%' }} onSubmit={(e) => e.preventDefault()}>
+                        <form className="mt-6 w-full md:max-w-none md:mr-[-14%] lg:mr-[-18%]" style={{ minWidth: '100%' }} onSubmit={handleHeroSearch}>
                             <label htmlFor="hero-search" className="sr-only">Search</label>
                             <div className="flex items-center gap-3 w-full">
                                 <input
                                     id="hero-search"
+                                    value={heroSearch}
+                                    onChange={(e) => setHeroSearch(e.target.value)}
                                     placeholder="🔍  Search for medicines, vitamins, baby care and personal care..."
                                     className="flex-1 min-w-0 bg-white/80 backdrop-blur-md border border-white/40 shadow-sm rounded-full px-6 py-3 text-[15px] outline-none"
                                 />
@@ -189,7 +215,7 @@ export default function Home() {
                 </div>
             </section>
 
-            {/* Collections */}
+            {/* Featured Products — Live from API */}
             <section className="mx-auto max-w-7xl px-4 py-24 md:px-8">
                 <motion.div 
                     initial="hidden"
@@ -199,67 +225,99 @@ export default function Home() {
                     className="mb-16 flex flex-col md:flex-row md:items-end justify-between gap-6"
                 >
                     <div className="max-w-2xl">
-                        <span className="kicker">Collections</span>
-                        <h2 className="display-heading mb-4">Curated Categories</h2>
+                        <span className="kicker">Featured</span>
+                        <h2 className="display-heading mb-4">Our Products</h2>
                         <p className="text-lg text-text-muted">
-                            Explore our meticulously selected categories, designed to address your specific health and wellness needs.
+                            Explore our latest additions — quality medicines and wellness essentials, all verified and ready for delivery.
                         </p>
                     </div>
                     <Link to="/products" className="glass-button-secondary inline-flex w-max">
-                        View All Categories
+                        View All Products
                         <Icon name="ArrowRight" className="h-4 w-4" />
                     </Link>
                 </motion.div>
 
-                <motion.div 
-                    initial="hidden"
-                    whileInView="visible"
-                    viewport={{ once: true }}
-                    variants={staggerContainer}
-                    className="grid auto-rows-[280px] grid-cols-1 gap-6 md:grid-cols-12"
-                >
-                    {collectionCards.map((card) =>
-                        card.large ? (
-                            <motion.div variants={fadeInUp} key={card.title} className="md:col-span-8 md:row-span-2">
-                                <Link to="/products" className="group relative block w-full h-full overflow-hidden rounded-3xl border border-border shadow-lg">
-                                    <img
-                                        className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-                                        alt={card.title}
-                                        src={card.image}
-                                    />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-                                    <div className="absolute bottom-0 left-0 p-8 md:p-10 w-full">
-                                        <h3 className="mb-3 font-serif text-4xl font-semibold text-white">{card.title}</h3>
-                                        <p className="max-w-md text-base text-white/80">{card.description}</p>
-                                    </div>
-                                </Link>
+                {loadingProducts ? (
+                    <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+                        {Array.from({ length: 4 }).map((_, i) => (
+                            <div key={i} className="glass-card h-[380px] animate-pulse overflow-hidden flex flex-col">
+                                <div className="h-48 bg-border/50" />
+                                <div className="p-5 space-y-4 flex-grow">
+                                    <div className="h-3 w-16 bg-border rounded-full" />
+                                    <div className="h-5 w-3/4 bg-border/80 rounded-full" />
+                                    <div className="h-4 w-1/2 bg-border/60 rounded-full" />
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                ) : featuredProducts.length > 0 ? (
+                    <motion.div 
+                        initial="hidden"
+                        whileInView="visible"
+                        viewport={{ once: true }}
+                        variants={staggerContainer}
+                        className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"
+                    >
+                        {featuredProducts.map((product) => (
+                            <motion.div key={product.id} variants={fadeInUp}>
+                                <ProductCard product={product} />
                             </motion.div>
-                        ) : (
-                            <motion.div variants={fadeInUp} key={card.title} className="md:col-span-4">
-                                <Link to="/products" className="group relative flex flex-col justify-end overflow-hidden rounded-3xl border border-border bg-surface p-6 h-full shadow-md hover:shadow-xl transition-all duration-300">
-                                    {card.image && (
-                                        <>
-                                            <img
-                                                className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105 opacity-80 group-hover:opacity-100"
-                                                alt={card.title}
-                                                src={card.image}
-                                            />
-                                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/10" />
-                                        </>
-                                    )}
-                                    <div className="relative z-10">
-                                        <div className="mb-4 inline-flex rounded-xl bg-white/20 backdrop-blur-md p-2 text-white">
-                                            <Icon name={card.icon || 'Pill'} className="h-6 w-6" />
-                                        </div>
-                                        <h3 className="font-serif text-2xl font-medium text-white mb-1">{card.title}</h3>
-                                        <p className="text-sm text-white/70 line-clamp-2">{card.description}</p>
-                                    </div>
-                                </Link>
-                            </motion.div>
-                        )
-                    )}
-                </motion.div>
+                        ))}
+                    </motion.div>
+                ) : (
+                    <div className="glass-card flex flex-col items-center justify-center py-16 text-center">
+                        <div className="flex h-20 w-20 items-center justify-center rounded-full bg-bg border border-border text-primary mb-4">
+                            <Icon name="PackageSearch" className="h-8 w-8 opacity-50" />
+                        </div>
+                        <p className="text-lg text-text-muted">Products will appear here once added from the admin panel.</p>
+                        <Link to="/products" className="glass-button-primary mt-6">Browse All Products</Link>
+                    </div>
+                )}
             </section>
+
+            {/* Categories — Live from API */}
+            {liveCategories.length > 0 && (
+                <section className="bg-surface border-y border-border py-24 relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-1/2 h-full bg-lofi opacity-20 blur-[100px] pointer-events-none" />
+                    <div className="mx-auto max-w-7xl px-4 md:px-8 relative z-10">
+                        <motion.div 
+                            initial="hidden"
+                            whileInView="visible"
+                            viewport={{ once: true }}
+                            variants={fadeInUp}
+                            className="mb-16 text-center max-w-2xl mx-auto"
+                        >
+                            <span className="kicker">Collections</span>
+                            <h2 className="display-heading mb-4">Shop by Category</h2>
+                            <p className="text-lg text-text-muted">
+                                Browse our curated categories to find exactly what you need.
+                            </p>
+                        </motion.div>
+
+                        <motion.div 
+                            initial="hidden"
+                            whileInView="visible"
+                            viewport={{ once: true }}
+                            variants={staggerContainer}
+                            className="grid gap-6 grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
+                        >
+                            {liveCategories.map((cat) => (
+                                <motion.div key={cat._id} variants={fadeInUp}>
+                                    <Link
+                                        to={`/products?category=${encodeURIComponent(cat.name)}`}
+                                        className="group glass-card flex flex-col items-center justify-center gap-4 p-8 text-center transition-all duration-300 hover:shadow-xl hover:border-primary/30"
+                                    >
+                                        <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 text-primary transition-all duration-300 group-hover:scale-110 group-hover:bg-primary/20">
+                                            <Icon name={getCategoryIcon(cat.name)} className="h-7 w-7" />
+                                        </div>
+                                        <h3 className="font-serif text-xl font-medium text-text">{cat.name}</h3>
+                                    </Link>
+                                </motion.div>
+                            ))}
+                        </motion.div>
+                    </div>
+                </section>
+            )}
 
             {/* Process */}
             <section className="bg-surface border-y border-border py-24 relative overflow-hidden">

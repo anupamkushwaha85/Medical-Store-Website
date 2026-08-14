@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import Seo from '../components/Seo';
 import Icon from '../components/Icons';
@@ -77,9 +78,9 @@ export default function FAQ() {
                     >
                         <h3 className="font-serif text-2xl mb-3 text-text">Still have questions?</h3>
                         <p className="text-text-muted mb-6">Can't find the answer you're looking for? Please contact our friendly team. </p>
-                        <a href="/contact" className="glass-button-primary inline-flex">
+                        <Link to="/contact" className="glass-button-primary inline-flex">
                             Get in Touch
-                        </a>
+                        </Link>
                     </motion.div>
                 </div>
             </div>
