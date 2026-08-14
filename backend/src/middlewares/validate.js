@@ -25,7 +25,15 @@ export const validate = (schema, source = 'body') => (req, _res, next) => {
         );
     }
 
-    // Replace the source with parsed (and transformed) data
-    req[source] = result.data;
+    if (source === 'query' || source === 'params') {
+        const keys = Object.keys(req[source]);
+        for (const key of keys) {
+            delete req[source][key];
+        }
+        Object.assign(req[source], result.data);
+    } else {
+        req[source] = result.data;
+    }
+    
     next();
 };

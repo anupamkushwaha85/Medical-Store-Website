@@ -16,11 +16,10 @@ const productSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 // Automatically calculate discount percentage before saving
-productSchema.pre('save', function(next) {
+productSchema.pre('save', function() {
     if (this.marked_price && this.selling_price) {
         this.discount_percentage = Math.max(0, Math.round(((this.marked_price - this.selling_price) / this.marked_price) * 100));
     }
-    next();
 });
 
 export default mongoose.model('Product', productSchema);
