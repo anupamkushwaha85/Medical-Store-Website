@@ -386,13 +386,11 @@ export default function AdminOwnerAshutosh() {
 
     if (checkingSession) {
         return (
-            <div className="min-h-screen bg-[#f7f6f1] text-slate-900 font-sans">
-                <div className="mx-auto flex min-h-screen max-w-7xl items-center justify-center px-6">
-                    <div className="w-full max-w-sm border border-slate-200 bg-white p-8">
-                        <p className="text-xs uppercase tracking-[0.28em] text-slate-500">Admin</p>
-                        <h1 className="mt-3 text-2xl font-semibold tracking-tight font-sans">Checking session</h1>
-                        <p className="mt-2 text-sm text-slate-600">Loading the admin workspace.</p>
-                    </div>
+            <div className="min-h-screen bg-slate-950 text-slate-100 font-sans flex items-center justify-center p-6">
+                <div className="w-full max-w-sm rounded-2xl border border-slate-800 bg-slate-900 p-8 text-center shadow-2xl">
+                    <Icon name="RefreshCw" className="h-8 w-8 text-teal-400 animate-spin mx-auto" />
+                    <h1 className="mt-4 text-xl font-semibold text-white">Loading Portal</h1>
+                    <p className="mt-1 text-sm text-slate-400">Verifying session...</p>
                 </div>
             </div>
         );
@@ -400,95 +398,87 @@ export default function AdminOwnerAshutosh() {
 
     if (!admin) {
         return (
-            <div className="min-h-screen bg-[#f7f6f1] text-slate-900 font-sans">
-                <div className="mx-auto grid min-h-screen max-w-7xl lg:grid-cols-[1.1fr_0.9fr]">
-                    <section className="flex items-center border-b border-slate-200 px-6 py-12 lg:border-b-0 lg:border-r lg:px-10">
-                        <div className="max-w-xl">
-                            <p className="text-xs uppercase tracking-[0.32em] text-slate-500">Admin workspace</p>
-                            <h1 className="mt-4 text-4xl font-semibold tracking-tight font-sans sm:text-5xl">Jaya Medical Store</h1>
-                            <p className="mt-4 max-w-lg text-base leading-7 text-slate-600">
-                                Private access for product, category, and order management.
-                            </p>
+            <div className="min-h-screen bg-slate-950 text-slate-100 font-sans flex items-center justify-center p-6 relative overflow-hidden">
+                <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-96 h-96 bg-teal-500/10 blur-[120px] rounded-full pointer-events-none" />
 
-                            <div className="mt-10 grid gap-3 text-sm text-slate-600 sm:grid-cols-2">
-                                <div className="border border-slate-200 bg-white p-4">
-                                    <p className="text-xs uppercase tracking-[0.24em] text-slate-400">Route</p>
-                                    <p className="mt-2 font-medium text-slate-900">/admin/owner/ashutosh</p>
-                                </div>
-                                <div className="border border-slate-200 bg-white p-4">
-                                    <p className="text-xs uppercase tracking-[0.24em] text-slate-400">Session</p>
-                                    <p className="mt-2 font-medium text-slate-900">Cookie-based auth</p>
-                                </div>
-                            </div>
+                <div className="w-full max-w-md rounded-2xl border border-slate-800 bg-slate-900/90 backdrop-blur-xl p-8 shadow-2xl relative z-10">
+                    <div className="text-center mb-8">
+                        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-teal-500/10 border border-teal-500/20 text-teal-400 mb-4">
+                            <Icon name="ShieldCheck" className="h-7 w-7" />
                         </div>
-                    </section>
+                        <span className="text-[11px] font-bold uppercase tracking-[0.25em] text-teal-400">Store Management</span>
+                        <h1 className="mt-2 text-2xl font-bold tracking-tight text-white font-sans">Jaya Medical Store</h1>
+                        <p className="mt-2 text-sm text-slate-400">Authorized personnel sign-in</p>
+                    </div>
 
-                    <section className="flex items-center px-6 py-12 lg:px-10">
-                        <form onSubmit={handleLogin} className="w-full max-w-md border border-slate-200 bg-white p-8">
-                            <p className="text-xs uppercase tracking-[0.28em] text-slate-500">Sign in</p>
-                            <h2 className="mt-3 text-2xl font-semibold tracking-tight font-sans">Admin login</h2>
-                            <p className="mt-2 text-sm text-slate-600">Use the admin username and password from the backend env file.</p>
+                    <form onSubmit={handleLogin} className="space-y-5">
+                        <label className="block">
+                            <span className="text-xs font-semibold uppercase tracking-wider text-slate-300">Username</span>
+                            <input
+                                name="username"
+                                value={loginForm.username}
+                                onChange={handleLoginChange}
+                                autoComplete="username"
+                                placeholder="Enter username"
+                                required
+                                className="mt-2 w-full rounded-xl border border-slate-800 bg-slate-950 px-4 py-3 text-sm text-white placeholder-slate-500 outline-none transition focus:border-teal-500 focus:ring-1 focus:ring-teal-500/30"
+                            />
+                        </label>
 
-                            <div className="mt-8 space-y-4">
-                                <label className="block">
-                                    <span className="text-sm font-medium text-slate-700">Username</span>
-                                    <input
-                                        name="username"
-                                        value={loginForm.username}
-                                        onChange={handleLoginChange}
-                                        autoComplete="username"
-                                        className="mt-2 w-full border border-slate-200 bg-[#fafaf8] px-4 py-3 outline-none transition focus:border-slate-900"
-                                    />
-                                </label>
+                        <label className="block">
+                            <span className="text-xs font-semibold uppercase tracking-wider text-slate-300">Password</span>
+                            <input
+                                name="password"
+                                value={loginForm.password}
+                                onChange={handleLoginChange}
+                                type="password"
+                                autoComplete="current-password"
+                                placeholder="Enter password"
+                                required
+                                className="mt-2 w-full rounded-xl border border-slate-800 bg-slate-950 px-4 py-3 text-sm text-white placeholder-slate-500 outline-none transition focus:border-teal-500 focus:ring-1 focus:ring-teal-500/30"
+                            />
+                        </label>
 
-                                <label className="block">
-                                    <span className="text-sm font-medium text-slate-700">Password</span>
-                                    <input
-                                        name="password"
-                                        value={loginForm.password}
-                                        onChange={handleLoginChange}
-                                        type="password"
-                                        autoComplete="current-password"
-                                        className="mt-2 w-full border border-slate-200 bg-[#fafaf8] px-4 py-3 outline-none transition focus:border-slate-900"
-                                    />
-                                </label>
-                            </div>
-
-                            <button
-                                type="submit"
-                                disabled={loginLoading}
-                                className="mt-6 inline-flex w-full items-center justify-center border border-slate-900 bg-slate-900 px-4 py-3 text-sm font-medium text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
-                            >
-                                {loginLoading ? 'Signing in' : 'Sign in'}
-                            </button>
-                        </form>
-                    </section>
+                        <button
+                            type="submit"
+                            disabled={loginLoading}
+                            className="mt-6 inline-flex w-full items-center justify-center rounded-xl bg-teal-600 px-4 py-3.5 text-sm font-semibold text-white transition hover:bg-teal-500 focus:ring-2 focus:ring-teal-500/40 disabled:cursor-not-allowed disabled:opacity-60 shadow-lg shadow-teal-900/30"
+                        >
+                            {loginLoading ? (
+                                <span className="flex items-center gap-2">
+                                    <Icon name="RefreshCw" className="h-4 w-4 animate-spin" />
+                                    Signing in...
+                                </span>
+                            ) : (
+                                'Sign In to Portal'
+                            )}
+                        </button>
+                    </form>
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-[#f7f6f1] text-slate-900 font-sans">
-            <div className="border-b border-slate-200 bg-white/80 backdrop-blur">
-                <div className="mx-auto flex max-w-7xl flex-col gap-4 px-6 py-5 lg:flex-row lg:items-center lg:justify-between lg:px-10">
+        <div className="min-h-screen bg-[#f8fafc] text-slate-900 font-sans">
+            <div className="border-b border-slate-200 bg-white/90 backdrop-blur sticky top-0 z-30">
+                <div className="mx-auto flex max-w-7xl flex-col gap-4 px-6 py-4 lg:flex-row lg:items-center lg:justify-between lg:px-10">
                     <div>
-                        <p className="text-xs uppercase tracking-[0.32em] text-slate-500">Private dashboard</p>
-                        <h1 className="mt-1 text-2xl font-semibold tracking-tight font-sans">Jaya Medical Store admin</h1>
-                        <p className="mt-1 text-sm text-slate-600">Route /admin/owner/ashutosh</p>
+                        <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-teal-700">Management Portal</span>
+                        <h1 className="mt-0.5 text-2xl font-bold tracking-tight font-sans text-slate-900">Jaya Medical Store Admin</h1>
                     </div>
 
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-4">
                         <div className="text-right">
-                            <p className="text-xs uppercase tracking-[0.24em] text-slate-400">Signed in as</p>
-                            <p className="text-sm font-medium text-slate-900">{admin.username}</p>
+                            <p className="text-[10px] uppercase tracking-[0.2em] text-slate-400">Signed in as</p>
+                            <p className="text-sm font-semibold text-slate-900">{admin.username}</p>
                         </div>
                         <button
                             type="button"
                             onClick={handleLogout}
-                            className="border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-900 hover:text-slate-900"
+                            className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-700 shadow-sm transition hover:border-slate-400 hover:text-slate-900"
                         >
-                            Log out
+                            Sign out
                         </button>
                     </div>
                 </div>
