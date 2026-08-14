@@ -1,12 +1,13 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import Seo from '../components/Seo';
 import Reveal from '../components/Reveal';
 import Icon from '../components/Icons';
 import ProductCard from '../components/ProductCard';
-import { products } from '../data/products';
 import { useCart } from '../context/CartContext';
+import { apiRequest } from '../lib/api';
+import { normalizeProduct, normalizeProducts } from '../lib/productAdapter';
 import toast from 'react-hot-toast';
 
 const tabs = [
@@ -22,12 +23,55 @@ export default function ProductDetail() {
     const { addToCart } = useCart();
     const [quantity, setQuantity] = useState(1);
     const [activeTab, setActiveTab] = useState('details');
+    const [product, setProduct] = useState(null);
+    const [relatedProducts, setRelatedProducts] = useState([]);
+    const [loading, setLoading] = useState(true);
 
-    const product = products.find((item) => item.id === Number(id));
-    const relatedProducts = useMemo(
-        () => products.filter((item) => item.category === product?.category && item.id !== product?.id).slice(0, 4),
-        [product],
-    );
+    useEffect(() => {
+        let isMounted = true;
+        setLoading(true);
+
+        const fetchProductDetail = async () => {
+            try {
+                const res = await apiRequest(`/api/products/${id}`);
+                if (isMounted && res && res.product) {
+                    const norm = normalizeProduct(res.product);
+                    setProduct(norm);
+
+                    // Fetch related products from same category
+                    if (norm.category) {
+                        const relatedRes = await apiRequest(`/api/products?limit=6`).catch(() => ({ products: [] }));
+                        if (isMounted && relatedRes && relatedRes.products) {
+                            const allNorm = normalizeProducts(relatedRes.products);
+                            setRelatedProducts(allNorm.filter(p => p.id !== norm.id).slice(0, 4));
+                        }
+                    }
+                }
+            } catch (err) {
+                console.error('Error loading product details:', err);
+                if (isMounted) setProduct(null);
+            } finally {
+                if (isMounted) setLoading(false);
+            }
+        };
+
+        if (id) {
+            fetchProductDetail();
+        }
+
+        return () => { isMounted = false; };
+    }, [id]);
+
+    if (loading) {
+        return (
+            <div className="mx-auto max-w-7xl px-4 py-24 min-h-[60vh] flex items-center justify-center">
+                <div className="flex flex-col items-center gap-4">
+                    <Icon name="RefreshCw" className="h-8 w-8 text-primary animate-spin" />
+                    <p className="text-sm font-medium text-text-muted">Loading product details...</p>
+                </div>
+            </div>
+        );
+    }
 
     if (!product) {
         return (
@@ -38,7 +82,7 @@ export default function ProductDetail() {
                         <Icon name="PackageSearch" className="h-10 w-10" />
                     </div>
                     <h1 className="mt-6 font-serif text-3xl font-semibold text-text">Product not found</h1>
-                    <p className="mt-3 text-base text-text-muted">This product is not in our catalog.</p>
+                    <p className="mt-3 text-base text-text-muted">This product is not available in our live catalog.</p>
                     <button
                         type="button"
                         onClick={() => navigate('/products')}
