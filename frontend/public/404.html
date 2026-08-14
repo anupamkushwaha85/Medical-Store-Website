@@ -4,11 +4,18 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <script>
-        const redirect = window.location.pathname + window.location.search + window.location.hash;
-        window.location.replace(redirect);
-    </script>
     <title>Jaya Medical Store</title>
+    <script>
+        // Single Page Application route redirect for GitHub Pages
+        (function () {
+            var l = window.location;
+            var route = l.pathname + l.search + l.hash;
+            try {
+                sessionStorage.setItem('ghp_redirect', route);
+            } catch (e) {}
+            l.replace(l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') + '/');
+        })();
+    </script>
 </head>
 
 <body>
