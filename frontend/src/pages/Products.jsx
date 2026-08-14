@@ -4,7 +4,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Seo from '../components/Seo';
 import ProductCard from '../components/ProductCard';
 import Icon from '../components/Icons';
-import { productBrands, productCategories, products } from '../data/products';
+import { apiRequest } from '../lib/api';
+import { normalizeProducts } from '../lib/productAdapter';
+import { defaultCategories } from '../data/products';
 
 const sortOptions = [
     { value: 'popular', label: 'Popularity' },
@@ -19,36 +21,73 @@ export default function Products() {
     const [category, setCategory] = useState(searchParams.get('category') || 'All');
     const [brand, setBrand] = useState('All');
     const [sortBy, setSortBy] = useState('popular');
-    const [priceCap, setPriceCap] = useState(3000);
+    const [priceCap, setPriceCap] = useState(10000);
     const [rxOnly, setRxOnly] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
     const [loading, setLoading] = useState(true);
+    const [rawProducts, setRawProducts] = useState([]);
+    const [fetchedCategories, setFetchedCategories] = useState([]);
 
-    const perPage = 8;
+    const perPage = 12;
 
-    // Simulated API Loading State
+    // Fetch live products & categories from API
     useEffect(() => {
+        let isMounted = true;
         setLoading(true);
-        const timer = window.setTimeout(() => setLoading(false), 800);
-        return () => window.clearTimeout(timer);
-    }, [searchParams, category, brand, priceCap, rxOnly, search, sortBy, currentPage]);
+
+        const loadStoreData = async () => {
+            try {
+                const [productRes, categoryRes] = await Promise.all([
+                    apiRequest('/api/products?limit=200'),
+                    apiRequest('/api/categories').catch(() => ({ categories: [] }))
+                ]);
+
+                if (isMounted) {
+                    if (productRes && productRes.products) {
+                        setRawProducts(normalizeProducts(productRes.products));
+                    }
+                    if (categoryRes && categoryRes.categories) {
+                        setFetchedCategories(categoryRes.categories.map(c => c.name));
+                    }
+                }
+            } catch (err) {
+                console.error('Failed to fetch products from backend:', err);
+            } finally {
+                if (isMounted) setLoading(false);
+            }
+        };
+
+        loadStoreData();
+
+        return () => { isMounted = false; };
+    }, []);
 
     useEffect(() => {
         setCategory(searchParams.get('category') || 'All');
         setCurrentPage(1);
     }, [searchParams]);
 
+    const categoryList = useMemo(() => {
+        const set = new Set(['All', ...fetchedCategories, ...defaultCategories]);
+        return Array.from(set);
+    }, [fetchedCategories]);
+
+    const brandList = useMemo(() => {
+        const brands = new Set(['All', ...rawProducts.map(p => p.brand).filter(Boolean)]);
+        return Array.from(brands);
+    }, [rawProducts]);
+
     const filteredProducts = useMemo(() => {
         const query = search.trim().toLowerCase();
 
-        const result = products
-            .filter((product) => (category === 'All' ? true : product.category === category))
+        const result = rawProducts
+            .filter((product) => (category === 'All' ? true : product.category.toLowerCase() === category.toLowerCase()))
             .filter((product) => (brand === 'All' ? true : product.brand === brand))
             .filter((product) => (rxOnly ? product.requiresPrescription : true))
             .filter((product) => product.price <= priceCap)
             .filter((product) => {
                 if (!query) return true;
-                return [product.name, product.brand, product.description, product.category]
+                return [product.name, product.brand, product.description, product.category, product.composition]
                     .join(' ')
                     .toLowerCase()
                     .includes(query);
@@ -56,15 +95,15 @@ export default function Products() {
 
         switch (sortBy) {
             case 'price-low':
-                return result.sort((left, right) => left.price - right.price);
+                return [...result].sort((left, right) => left.price - right.price);
             case 'price-high':
-                return result.sort((left, right) => right.price - left.price);
+                return [...result].sort((left, right) => right.price - left.price);
             case 'newest':
-                return result.sort((left, right) => right.id - left.id);
+                return [...result].sort((left, right) => new Date(right.createdAt || 0) - new Date(left.createdAt || 0));
             default:
                 return result;
         }
-    }, [brand, category, priceCap, search, rxOnly, sortBy]);
+    }, [brand, category, priceCap, search, rxOnly, sortBy, rawProducts]);
 
     const totalPages = Math.max(1, Math.ceil(filteredProducts.length / perPage));
     const pageItems = filteredProducts.slice((currentPage - 1) * perPage, currentPage * perPage);
@@ -74,7 +113,7 @@ export default function Products() {
         setCategory('All');
         setBrand('All');
         setSortBy('popular');
-        setPriceCap(3000);
+        setPriceCap(10000);
         setRxOnly(false);
         setCurrentPage(1);
     };
@@ -171,7 +210,7 @@ export default function Products() {
                                     className="w-full rounded-lg border border-border bg-bg px-3 py-2 text-[13px] text-text outline-none transition-colors focus:border-primary focus:ring-1 focus:ring-primary/20 appearance-none"
                                     style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.75rem center', backgroundSize: '1em' }}
                                 >
-                                    {productCategories.map((option) => (
+                                    {categoryList.map((option) => (
                                         <option key={option} value={option}>{option}</option>
                                     ))}
                                 </select>
@@ -186,9 +225,8 @@ export default function Products() {
                                     className="w-full rounded-lg border border-border bg-bg px-3 py-2 text-[13px] text-text outline-none transition-colors focus:border-primary focus:ring-1 focus:ring-primary/20 appearance-none"
                                     style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.75rem center', backgroundSize: '1em' }}
                                 >
-                                    <option value="All">All Brands</option>
-                                    {productBrands.map((option) => (
-                                        <option key={option} value={option}>{option}</option>
+                                    {brandList.map((option) => (
+                                        <option key={option} value={option}>{option === 'All' ? 'All Brands' : option}</option>
                                     ))}
                                 </select>
                             </label>

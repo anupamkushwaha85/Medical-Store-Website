@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
-import { products } from '../data/products';
+import { normalizeProduct } from '../lib/productAdapter';
 
 const CartContext = createContext(null);
 const STORAGE_KEY = 'jaya-medical-cart';
@@ -30,15 +30,19 @@ export function CartProvider({ children }) {
     }, [items]);
 
     const addToCart = (product, quantity = 1) => {
+        const norm = normalizeProduct(product);
+        if (!norm) return;
+
         setItems((currentItems) => {
-            const existing = currentItems.find((item) => item.id === product.id);
+            const targetId = norm.id || norm._id;
+            const existing = currentItems.find((item) => (item.id === targetId || item._id === targetId));
             if (existing) {
                 return currentItems.map((item) =>
-                    item.id === product.id ? { ...item, quantity: item.quantity + quantity } : item,
+                    (item.id === targetId || item._id === targetId) ? { ...item, quantity: item.quantity + quantity } : item,
                 );
             }
 
-            return [...currentItems, { ...product, quantity }];
+            return [...currentItems, { ...norm, quantity }];
         });
     };
 
@@ -48,12 +52,12 @@ export function CartProvider({ children }) {
         }
 
         setItems((currentItems) =>
-            currentItems.map((item) => (item.id === productId ? { ...item, quantity } : item)),
+            currentItems.map((item) => ((item.id === productId || item._id === productId) ? { ...item, quantity } : item)),
         );
     };
 
     const removeFromCart = (productId) => {
-        setItems((currentItems) => currentItems.filter((item) => item.id !== productId));
+        setItems((currentItems) => currentItems.filter((item) => (item.id !== productId && item._id !== productId)));
     };
 
     const clearCart = () => setItems([]);
@@ -64,12 +68,12 @@ export function CartProvider({ children }) {
     );
 
     const subtotal = useMemo(
-        () => items.reduce((total, item) => total + item.price * item.quantity, 0),
+        () => items.reduce((total, item) => total + (item.price || item.selling_price || 0) * item.quantity, 0),
         [items],
     );
 
     const cartProducts = useMemo(
-        () => items.map((item) => products.find((product) => product.id === item.id) || item),
+        () => items,
         [items],
     );
 
