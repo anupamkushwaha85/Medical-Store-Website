@@ -88,13 +88,13 @@ export const updateOrderStatusSchema = z.object({
 
 export const productQuerySchema = z.object({
     page: z.coerce.number().int().positive().optional().default(1),
-    limit: z.coerce.number().int().min(1).max(100).optional().default(20),
+    limit: z.coerce.number().int().min(1).max(500).optional().default(20),
     category: z.string().optional(),
     search: z.string().optional(),
 });
 
 export const orderQuerySchema = z.object({
     page: z.coerce.number().int().positive().optional().default(1),
-    limit: z.coerce.number().int().min(1).max(100).optional().default(20),
+    limit: z.coerce.number().int().min(1).max(500).optional().default(20),
     status: z.string().optional(),
 });

@@ -9,7 +9,7 @@ import { cacheGet, cacheSet, cacheDel, cacheInvalidatePattern } from '../config/
  */
 export const createCategory = asyncHandler(async (req, res) => {
     const { name } = req.body;
-    const slug = name.toLowerCase().replace(/\s+/g, '-');
+    const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 
     try {
         const category = await Category.create({ name, slug });
@@ -60,7 +60,7 @@ export const getCategoryBySlug = asyncHandler(async (req, res) => {
  */
 export const updateCategory = asyncHandler(async (req, res) => {
     const { name } = req.body;
-    const slug = name.toLowerCase().replace(/\s+/g, '-');
+    const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 
     try {
         const category = await Category.findByIdAndUpdate(
