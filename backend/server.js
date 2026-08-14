@@ -54,16 +54,41 @@ connectCloudinary();
 connectRedis();
 
 // ─── Middlewares ──────────────────────────────────────────────────────────────
-const allowedOrigins = process.env.CLIENT_URL
-    ? process.env.CLIENT_URL.split(',').map(url => url.trim())
-    : ['http://localhost:5173'];
+const envOrigins = process.env.CLIENT_URL
+    ? process.env.CLIENT_URL.split(',').map(url => url.trim().replace(/\/$/, ''))
+    : [];
+
+const defaultOrigins = [
+    'https://jayamedicalstore.work.gd',
+    'http://jayamedicalstore.work.gd',
+    'http://localhost:5173',
+    'http://localhost:3000',
+    'http://127.0.0.1:5173'
+];
+
+const allowedOrigins = Array.from(new Set([...defaultOrigins, ...envOrigins]));
 
 app.use(cors({
-    origin: allowedOrigins,
+    origin: (origin, callback) => {
+        // Allow requests with no origin (e.g. UptimeRobot, curl, server-to-server)
+        if (!origin) return callback(null, true);
+        const cleanOrigin = origin.replace(/\/$/, '');
+        if (allowedOrigins.includes(cleanOrigin) || allowedOrigins.includes('*')) {
+            return callback(null, true);
+        }
+        if (/^https?:\/\/localhost(:\d+)?$/.test(cleanOrigin) || /^https?:\/\/127\.0\.0\.1(:\d+)?$/.test(cleanOrigin)) {
+            return callback(null, true);
+        }
+        return callback(null, true); // Permissive CORS fallback for custom domain/preview deployments
+    },
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS', 'HEAD'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin']
 }));
 
-app.use(helmet());
+app.use(helmet({
+    crossOriginResourcePolicy: { policy: 'cross-origin' },
+}));
 app.use(createAdminSessionMiddleware());
 
 // Logging
@@ -74,37 +99,37 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 // Body parsing
-// Note: We're using standard JSON parsing. For Razorpay webhooks, raw body parsing might be needed in production.
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Rate Limiting
 app.use('/api', globalLimiter);
 
-// ─── Routes ───────────────────────────────────────────────────────────────────
-
-// Health Check
-app.get('/api/health', (req, res) => {
-    res.json({
+// ─── Health Check Endpoints (for UptimeRobot & Monitors) ─────────────────────
+const sendHealthOk = (req, res) => {
+    if (req.method === 'HEAD') {
+        return res.sendStatus(200);
+    }
+    return res.status(200).json({
         status: 'ok',
-        timestamp: new Date(),
         uptime: process.uptime(),
-        environment: process.env.NODE_ENV
+        timestamp: new Date().toISOString(),
+        environment: process.env.NODE_ENV || 'production'
     });
-});
+};
 
-app.head('/api/health', (req, res) => {
-    res.sendStatus(200);
-});
+app.get('/health', sendHealthOk);
+app.head('/health', sendHealthOk);
 
-app.get('/healthz', (req, res) => {
-    res.status(200).send('ok');
-});
+app.get('/api/health', sendHealthOk);
+app.head('/api/health', sendHealthOk);
 
-app.head('/healthz', (req, res) => {
-    res.sendStatus(200);
-});
+app.get('/healthz', (req, res) => res.status(200).send('ok'));
+app.head('/healthz', (req, res) => res.sendStatus(200));
 
+app.head('/', (req, res) => res.sendStatus(200));
+
+// ─── API Routes ───────────────────────────────────────────────────────────────
 app.use('/api/auth', authRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/products', productRoutes);
@@ -125,6 +150,10 @@ app.use((req, res, next) => {
 
 // Global Error Handler
 app.use((err, req, res, next) => {
+    // Multer file size error
+    if (err.code === 'LIMIT_FILE_SIZE') {
+        err = new AppError('File size exceeds 1MB limit. Please upload an image under 1MB.', 400);
+    }
     // Mongoose Validation Error
     if (err.name === 'ValidationError') {
         const details = Object.values(err.errors).map(val => ({
