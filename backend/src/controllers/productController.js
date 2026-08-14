@@ -12,6 +12,10 @@ export const createProduct = asyncHandler(async (req, res) => {
         throw Errors.badRequest('Product image is required');
     }
 
+    if (req.file.size > 1 * 1024 * 1024) {
+        throw Errors.badRequest('Image size exceeds 1MB limit. Please upload an image smaller than 1MB.');
+    }
+
     // Upload image to Cloudinary
     const b64 = Buffer.from(req.file.buffer).toString('base64');
     let dataURI = 'data:' + req.file.mimetype + ';base64,' + b64;
@@ -139,6 +143,10 @@ export const updateProduct = asyncHandler(async (req, res) => {
 
     // Handle image update
     if (req.file) {
+        if (req.file.size > 1 * 1024 * 1024) {
+            throw Errors.badRequest('Image size exceeds 1MB limit. Please upload an image smaller than 1MB.');
+        }
+
         // Delete old image from Cloudinary if it exists and is not a default placeholder
         if (product.image_url && product.image_url.includes('cloudinary')) {
             try {
