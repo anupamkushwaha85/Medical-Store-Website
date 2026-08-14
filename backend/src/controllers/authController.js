@@ -1,5 +1,6 @@
+import jwt from 'jsonwebtoken';
 import { asyncHandler, Errors } from '../utils/errors.js';
-import { getAdminSessionName, getAdminSessionSameSite } from '../config/session.js';
+import { getAdminSessionName, getAdminSessionSameSite, getAdminSessionSecret } from '../config/session.js';
 
 const promisifySessionAction = (action) => new Promise((resolve, reject) => {
     action((error) => {
@@ -50,20 +51,28 @@ export const adminLogin = asyncHandler(async (req, res) => {
 
     await promisifySessionAction((done) => req.session.save(done));
 
+    // Generate JWT for alternative auth that bypasses third-party cookie restrictions
+    const token = jwt.sign(
+        { username, role: 'admin' },
+        getAdminSessionSecret(),
+        { expiresIn: '7d' }
+    );
+
     res.json({
         success: true,
         admin: req.session.admin,
+        token
     });
 });
 
 export const getAdminSession = asyncHandler(async (req, res) => {
-    if (!req.session?.admin?.username) {
+    if (!req.admin?.username) {
         throw Errors.unauthorized('Admin session not found');
     }
 
     res.json({
         success: true,
-        admin: req.session.admin,
+        admin: req.admin,
     });
 });
 

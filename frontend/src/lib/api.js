@@ -18,16 +18,16 @@ export const apiUrl = (path) => `${API_BASE}${path.startsWith('/') ? path : `/${
 
 export const apiRequest = async (path, options = {}) => {
     const isFormData = options.body instanceof FormData;
+    const token = localStorage.getItem('adminToken');
 
     const response = await fetch(apiUrl(path), {
         credentials: 'include',
         ...options,
-        headers: isFormData
-            ? options.headers
-            : {
-                'Content-Type': 'application/json',
-                ...(options.headers || {}),
-            },
+        headers: {
+            ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+            ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
+            ...(options.headers || {}),
+        },
     });
 
     const data = await parseResponse(response);

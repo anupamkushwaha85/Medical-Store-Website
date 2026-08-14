@@ -145,7 +145,9 @@ export default function AdminOwnerAshutosh() {
                 method: 'POST',
                 body: JSON.stringify(loginForm),
             });
-
+            if (response.token) {
+                localStorage.setItem('adminToken', response.token);
+            }
             setAdmin(response.admin || null);
             setLoginForm(initialLogin);
             toast.success('Admin session started');
@@ -162,6 +164,7 @@ export default function AdminOwnerAshutosh() {
             await apiRequest('/api/admin/session/logout', {
                 method: 'POST',
             });
+            localStorage.removeItem('adminToken');
             setAdmin(null);
             setProducts([]);
             setCategories([]);
