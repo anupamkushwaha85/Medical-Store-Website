@@ -42,10 +42,10 @@ jobs:
       - name: Build
         run: npm run build
         env:
-          VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}
-          VITE_EMAILJS_SERVICE_ID: ${{ secrets.VITE_EMAILJS_SERVICE_ID }}
-          VITE_EMAILJS_CONTACT_TEMPLATE: ${{ secrets.VITE_EMAILJS_CONTACT_TEMPLATE }}
-          VITE_EMAILJS_PUBLIC_KEY: ${{ secrets.VITE_EMAILJS_PUBLIC_KEY }}
+          VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL || 'https://medical-store-website-rb6b.onrender.com' }}
+          VITE_EMAILJS_SERVICE_ID: ${{ secrets.VITE_EMAILJS_SERVICE_ID || 'service_zy0x4ph' }}
+          VITE_EMAILJS_CONTACT_TEMPLATE: ${{ secrets.VITE_EMAILJS_CONTACT_TEMPLATE || 'template_xgn8hpq' }}
+          VITE_EMAILJS_PUBLIC_KEY: ${{ secrets.VITE_EMAILJS_PUBLIC_KEY || 'xU_Uh9DDa8ERv-Fsm' }}
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
@@ -55,3 +55,13 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
+      - name: Trigger Render Backend Deployment
+        if: success()
+        run: |
+          if [ -n "${{ secrets.RENDER_DEPLOY_HOOK_URL }}" ]; then
+            echo "🚀 Triggering Render backend deployment..."
+            curl -s -X POST "${{ secrets.RENDER_DEPLOY_HOOK_URL }}"
+          else
+            echo "ℹ️ RENDER_DEPLOY_HOOK_URL secret not set. Skipping manual trigger (Render auto-deploy will handle push if configured)."
+          fi
